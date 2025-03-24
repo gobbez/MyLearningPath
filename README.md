@@ -54,4 +54,37 @@ python manage.py migrate
 ```
 
 ### Chapter 3. Admin
-<li>Modify file libreria/admin.py</li>
+<li>Modify file libreria/admin.py like this:</li>
+
+```bash
+from django.contrib import admin
+
+# Register your models here.
+from . import models
+
+admin.site.register(models.Genere)
+admin.site.register(models.Autore)
+admin.site.register(models.Libro)
+```
+<li>Create a superuser from command and following instructions (to set username, email, password)</li>
+
+```bash
+python manage.py createsuperuser
+```
+<li>Start server and go to http://127.0.0.1:8000/admin/</li>
+<li>(optional) In each table (libreria/models.py) add a class Meta to make the visualizzation of the table names correct:</li>
+
+```bash
+class Meta:
+    verbose_name_plural = "Autori" (# same thing for "Generi" and "Libri")
+```
+
+<li>In each table (libreria/models.py) ad a __str__(self): function that returns correctly the column names</li>
+
+```bash
+class __str__(self):
+    return f"{self.nome} {self.cognome}"  (# same thing for other tables)
+```
+
+<li>Create a new libro, new autore and new genere via admin panel on the browser</li>
+Now you are free to add/modify/delete as many rows in the tables as you want!
