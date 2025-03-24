@@ -21,6 +21,8 @@ class Libro(models.Model):
     titolo = models.CharField(max_length=200)
     autore = models.ForeignKey(Autore, on_delete=models.PROTECT)
     genere = models.ForeignKey(Genere, on_delete=models.PROTECT)
+    data_acquisto = models.DateField(null=True, verbose_name="Data di acquisto")
+
     def __str__(self):
        return f"{self.titolo}"
     class Meta:
