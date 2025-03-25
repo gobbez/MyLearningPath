@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 
 from hello import views
 from libreria import views as views_libreria
@@ -23,7 +23,5 @@ from libreria import views as views_libreria
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', views.hello, name='hello'),
-    path('libri/', views_libreria.libri, name="libri"),
-    re_path('^libri/(\d+)/$', views_libreria.libro, name="libro"),
-    re_path(r'^libri/acquistati/(?P<anno>\d{4})/(?P<mese>\d{1,2})/$', views_libreria.libri_per_data_acquisto),
+    path('libri/', include('libreria.urls')),
 ]

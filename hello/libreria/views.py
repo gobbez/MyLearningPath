@@ -1,12 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import *
 
 def libri(request):
-    elenco = ""
-    for libro in Libro.objects.all().order_by('titolo'):
-        elenco += (f'"{libro.titolo}" di {libro.autore}, {libro.genere}<br>')
-    return HttpResponse(elenco)
+    context = {'libri': Libro.objects.all().order_by('titolo')}
+    return render(request, "libri.html", context)
 
 def libro(request, pk):
     try:
@@ -23,3 +21,13 @@ def libri_per_data_acquisto(request, mese, anno):
     if elenco == "":
         elenco = "Nessun libro"
     return HttpResponse(elenco)
+
+def libri_genere(request, pk):
+    genere = get_object_or_404(Genere, pk=pk)
+    context = {'libri': Libro.objects.filter(genere=genere).order_by('titolo'), 'genere': genere}
+    return render(request, "libri.html", context)
+
+def libri_autore(request, pk):
+    autore = get_object_or_404(Autore, pk=pk)
+    context = {'libri': Libro.objects.filter(autore=autore).order_by('titolo'), 'autore': autore}
+    return render(request, "libri.html", context)

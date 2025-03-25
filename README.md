@@ -179,3 +179,86 @@ http://127.0.0.1:8000/libri/acquistati/2025/3/
 ```
 
 Now you can filter for data as well!
+
+<br>
+
+### Chapter 5. Templates
+
+<li>Create a new directory as libreria/templates</li>
+<li>Create html (Template) file libreria/templates/libri.html that uses a for loop to show books</li>
+<li>Change function libri in libreria/views.py:</li>
+
+```bash
+def libri(request):
+    context = {'libri': Libro.objects.all().order_by('titolo')}
+    return render(request, "libri.html", context)
+```
+<li>Update file libreria/templates/libri.html to add links of the books</li>
+<li>Add the new routes in hello/urls.py: </li>
+
+```bash
+    re_path('^libri/autore/(?P<pk>\d+)/$', views_libreria.libri_autore, name='libri_autore'),
+    re_path('^libri/genere/(?P<pk>\d+)/$', views_libreria.libri_genere, name='libri_genere'),
+```
+
+<li>Add the two new functions in libreria/views.py:</li>
+
+```bash
+def libri_genere(request, pk):
+    genere = get_object_or_404(Genere, pk=pk)
+    context = {'libri': Libro.objects.filter(genere=genere).order_by('titolo'), 'genere': genere}
+    return render(request, "libri.html", context)
+
+def libri_autore(request, pk):
+    autore = get_object_or_404(Autore, pk=pk)
+    context = {'libri': Libro.objects.filter(autore=autore).order_by('titolo'), 'autore': autore}
+    return render(request, "libri.html", context)
+```
+<li>Update file libreria/templates/libri.html</li>
+<li>Change hello/urls.py so that it uses include to call the libreria/urls.py: </li>
+
+```bash
+from django.contrib import admin
+from django.urls import path, re_path, include
+
+from hello import views
+from libreria import views as views_libreria
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('hello/', views.hello, name='hello'),
+    path('libri/', include('libreria.urls')),
+]
+```
+
+<li>Create libreria/urls.py: </li>
+
+```bash
+from django.urls import path, re_path
+from . import views
+
+urlpatterns = [
+    path('', views.libri, name="libri"),
+    re_path('^(\d+)/$', views.libro, name="libro"),
+    re_path(r'^acquistati/(?P<anno>\d{4})/(?P<mese>\d{1,2})/$', views.libri_per_data_acquisto),
+    re_path('^autore/(?P<pk>\d+)/$', views.libri_autore, name='libri_autore'),
+    re_path('^genere/(?P<pk>\d+)/$', views.libri_genere, name='libri_genere'),
+]
+```
+<li>Create a new folder templates in the root of the project</li>
+<li>Create the base html file templates/base.html</li>
+<li>Add the following in hello.settings.py in TEMPLATES: </li>
+
+```bash
+    'DIRS': [BASE_DIR / "templates"],
+```
+
+<li>Add the following in libreria/templates/libri.html to extend the base.html file: </li>
+
+```bash
+{% extends "base.html" %}
+{% block title %}La mia libreria{% endblock %}
+{% block content %}
+```
+
+Now we have created a templates file to show our library and books, with links!
