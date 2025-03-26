@@ -262,3 +262,28 @@ urlpatterns = [
 ```
 
 Now we have created a templates file to show our library and books, with links!
+
+<br>
+
+### Chapter 6. Forms
+
+<li>Add a route for wikipedia search on libreria/urls.py:</li>
+
+```bash
+re_path('^ricerca/$', views_wiki.ricerca, name='libri_ricerca'),
+```
+
+<li>Create a new file libreria/templates/libreria/wikisearch.html</li>
+<li>Create a new file libreria/views_wiki.py</li>
+<li>Add a function in the WikisearchForm class on libreria/views_wiki.py</li>
+<li>Modify form.as_p to put in a table, in libreria/templates/libreria/wikisearch.html</li>
+
+```bash
+<table border="1">
+    {{ form.as_table }}
+</table>
+```
+
+We have seen how to create some simple forms in a new html page!
+
+
