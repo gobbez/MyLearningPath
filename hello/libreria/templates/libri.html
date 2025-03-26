@@ -11,7 +11,11 @@
 {% endif %}
 <dl>
 {% for libro in libri %}
-    <dt><strong>"{{ libro.titolo }}"</strong></dt>
+    <dt><strong>"{{ libro.titolo }}"</strong>
+    {% if user.is_staff %}
+        <a href="{% url 'admin:libreria_libro_change' libro.pk %}">[E]</a>
+    {% endif %}
+    </dt>
     <dd><em><a href="{% url 'libri_autore' pk=libro.autore.id %}"> {{ libro.autore }}</a></em>
         - <a href="{% url 'libri_genere' pk=libro.genere.id %}">{{ libro.genere }}</a></dd>
     <dd><small>acquistato nel {{ libro.data_acquisto|date:"F \d\e\l Y"}}</small></dd>

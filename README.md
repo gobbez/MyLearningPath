@@ -291,4 +291,35 @@ We have seen how to create some simple forms in a new html page!
 
 ### Chapter 7. Query
 
-<li>Excercizes with Django shell to create, filter, update, delete different rows on the tables (no new code)</li>
+<li>Exercises with Django shell to create, filter, update, delete different rows on the tables (no new code)</li>
+
+
+<br>
+
+### Chapter 8. Security and Permissions
+
+<li>Go to admin panel and create and advanced user that can edit Autori table</li>
+<li>Now create a Group with the same grants</li>
+<li>Apply this new Group to the new user</li>
+
+<li>Differentiate pages based on user's role by modifying libreria/libri.html for loop:</li>
+
+```bash
+{% if user.is_staff %}
+    <a href="{% url 'admin:libreria_libro_change' libro.pk %}">[E]</a>
+{% endif %}
+```
+
+Now users with grants can edit in the http://127.0.0.1:8000/libri/ !
+
+<li>Add login_required to see pages, in libreria/views_wiki.py: </li>
+
+```bash
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def ricerca(request):
+```
+
+Now users that aren't logged in cannot search our books!
+

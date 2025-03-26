@@ -3,6 +3,7 @@ from urllib import parse
 from urllib.request import urlopen
 from django import forms
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .models import *
 
 class WikisearchForm(forms.Form):
@@ -19,6 +20,8 @@ class WikisearchForm(forms.Form):
             raise forms.ValidationError("Massimo 50 risultati in inglese")
         return self.cleaned_data['limite']
 
+
+@login_required
 def ricerca(request):
     wiki_url_api = ("https://{wikipedia}.wikipedia.org/w"
                     "/api.php?action=query&format=json"
