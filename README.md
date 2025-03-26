@@ -90,7 +90,7 @@ class __str__(self):
 <li>Create a new libro, new autore and new genere via admin panel on the browser</li>
 Now you are free to add/modify/delete as many rows in the tables as you want!
 
-<br>
+<br><br>
 
 ### Chapter 4. Url
 
@@ -287,3 +287,8 @@ re_path('^ricerca/$', views_wiki.ricerca, name='libri_ricerca'),
 We have seen how to create some simple forms in a new html page!
 
 
+<br>
+
+### Chapter 7. Query
+
+<li>Excercizes with Django shell to create, filter, update, delete different rows on the tables (no new code)</li>
