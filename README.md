@@ -519,3 +519,38 @@ path('async-sync/', include('async_sync.urls')),
 Now we can see the differences between a Sync and Async routes!
 
 
+<br>
+
+### Chapter 12 - How to generate PDF files
+
+<li>Install Weasyprint module: </li>
+
+```bash
+pip install weasyprint
+```
+
+<li>Add a function to generate pdf file in libreria/views.py: </li>
+
+```bash
+from weasyprint import HTML
+
+def libri_pdf(request):
+    html = HTML(string=libri(request).content)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = ('attachment; filename="libri.pdf"')
+
+    html.write_pdf(response)
+    return response
+```
+
+<li>Create route in libreria/urls.py: </li>
+
+```bash
+re_path('pdf/', views.libri_pdf, name='libri_pdf'),
+```
+
+<li>Run server and create a pdf file with the url: http://127.0.0.1:8000/libri/pdf/ </li>
+
+Now you can convert your html page in a pdf file!
+PLEASE NOTE: IF YOU ARE USING WINDOWS YOU ALSO NEED TO INSTALL GTK (gtk3-runtime-*.exe)
+
