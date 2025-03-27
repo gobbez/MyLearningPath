@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Ricerca Wikipedia{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Ricerca Wikipedia" %}{% endblock %}
 {% block content %}
-<h1>Ricerca Wikipedia</h1>
+<h1>{% trans "Ricerca Wikipedia" %}</h1>
 <form action="." method="POST">
     {% csrf_token %}
     <table border="1">
         {{ form.as_table }}
     </table>
-    <input type="submit" value="cerca" />
+    <input type="submit" value="{% trans 'Cerca' %}" />
 </form>
 {% if risultati %}
-    <h2>{{ risultati|length }} risultati</h2>
+    <h2>{% blocktrans with risultati|length as numero_risultati %}{{ numero_risultati }} risultati{% endblocktrans %}</h2>
     <ul>
         {% for ris in risultati %}
             <li><a href='{{ link }}{{ ris.title }}'>{{ ris.title }}</a> </li>

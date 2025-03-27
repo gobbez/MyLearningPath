@@ -323,3 +323,145 @@ def ricerca(request):
 
 Now users that aren't logged in cannot search our books!
 
+
+<br>
+
+### Chapter 9. Internationalization
+
+<li>Change/Add some params in hello/settings.py to activate multi-language: </li>
+
+```bash
+LANGUAGES = [
+    ('it', 'Italiano'),
+    ('en', 'English'),
+]
+
+MIDDLEWARE_CLASSES = [
+    'django.middleware.locale.LocaleMiddleware',
+]
+
+TEMPLATES = [
+    {
+        ...
+        'OPTIONS': {
+            'context_processors': [
+                ...
+                'django.template.context_processors.i18n',
+            ],
+        },
+    },
+]
+```
+
+<li>Modify hello/base.html to add the form to change language</li>
+<li>Add a new route in hello/urls.py: </li>
+
+```bash
+path("i18n/", include("django.conf.urls.i18n")),
+```
+
+<li>Modify libreria/view_wiki.py to set the strings to translate: </li>
+
+```bash
+from django.utils.translation import gettext_lazy as _
+
+    ...
+    raise forms.ValidationError(_("Massimo 50 risultati in inglese"))
+```
+
+<li>Modify libreria/wiki_search.html to elaborate the string to translate</li>
+<li>Create new folder libreria/locale</li>
+<li>Execute the following command: </li>
+
+```bash
+python manage.py makemessages -l en --no-wrap
+```
+PLEASE NOTE: TO DO THE ABOVE YOU MUST HAVE GETTEXT ON YOUR PC AND YOU MUST ADD ITS BIN FOLDER TO THE ENVIRONMENT VARIABLE!!
+
+<li>Modify file libreria/locale/en/LC_MESSAGES/django.po: </li>
+
+```bash
+msgid "Ricerca Wikipedia"
+msgstr "Wikipedia Search"
+
+#: .\libreria\templates\libreria\wikisearch.html:11
+msgid "Cerca"
+msgstr "Search"
+
+#: .\libreria\templates\libreria\wikisearch.html:14
+#, python-format
+msgid "%(numero_risultati)s risultati"
+msgstr "%(numero_risultati)s results"
+
+#: .\libreria\views_wiki.py:21
+msgid "Massimo 50 risultati in inglese"
+msgstr "Max 50 english results"
+```
+
+<li>Execute the following command: </li>
+
+```bash
+python manage.py compilemessages
+```
+
+Now the code should allow you to translate in different languages!
+
+
+<br>
+
+### Chapter 10. Signals
+
+<li>Create a new file in libreria/helpers.py: </li>
+
+```bash
+import sys
+
+def log_colorato(messaggio):
+    GIALLO_SU_NERO = "\033[43m\033[30m"
+    RESET = "\033[0m"
+
+    sys.stdout.write(f"{GIALLO_SU_NERO}{messaggio}{RESET}")
+    sys.stdout.flush()
+```
+
+<li>Create a new file in libreria/signals.py: </li>
+
+```bash
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from .helpers import log_colorato
+from .models import Autore
+
+@receiver(post_save, sender=Autore)
+def libro_post_save(sender, instance, created, **kwargs):
+    if created:
+        log_colorato(f"Un nuovo {sender.__name__} è stato creato: {instance}")
+    else:
+        log_colorato(f"Un {sender.__name__} esistente è stato aggiornato: {instance}")
+```
+
+<li>Modify libreria/apps.py to make the signals work: </li>
+
+```bash
+from django.apps import AppConfig
+
+class LibreriaConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'libreria'
+
+    def ready(self):
+        import libreria.signals
+```
+
+<li>Run server and create a new Autor via admin panel. You will see some colored prints in the shell!</li>
+
+<li>Modify libreria/signals.py to create some functions that shows users logged when someone logs in, using: </li>
+
+```bash
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.db.models.signals import Signal
+```
+
+Now we can create some personalized functions using Signals!
+

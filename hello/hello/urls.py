@@ -24,4 +24,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', views.hello, name='hello'),
     path('libri/', include('libreria.urls')),
+    path("i18n/", include("django.conf.urls.i18n")),
 ]

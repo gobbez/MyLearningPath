@@ -4,6 +4,7 @@ from urllib.request import urlopen
 from django import forms
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext_lazy as _
 from .models import *
 
 class WikisearchForm(forms.Form):
@@ -17,7 +18,7 @@ class WikisearchForm(forms.Form):
 
     def clean_limite(self):
         if (self.cleaned_data['limite'] > 50 and self.cleaned_data['wikipedia'] == 'en'):
-            raise forms.ValidationError("Massimo 50 risultati in inglese")
+            raise forms.ValidationError(_("Massimo 50 risultati in inglese"))
         return self.cleaned_data['limite']
 
 
