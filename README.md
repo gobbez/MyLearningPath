@@ -465,3 +465,57 @@ from django.db.models.signals import Signal
 
 Now we can create some personalized functions using Signals!
 
+
+<br>
+
+### Chapter 11. Async Vs Sync
+
+<li>Install Daphne, a module to use server ASGI: </li>
+
+```bash
+pip install daphne
+```
+
+<li>Modify file hello/settings.py to include daphne and set ASGI_APPLICATION instead of WSGI_APPLICATION: </li>
+
+```bash
+INSTALLED_APPS = [
+    'daphne',
+    ...
+]
+
+# WSGI_APPLICATION = 'hello.wsgi.application'
+ASGI_APPLICATION = 'hello.asgi.application'
+```
+
+<li>Create a new application for async or sync: </li>
+
+```bash
+django-admin startapp async_sync
+```
+
+<li>Create file async_sync/urls.py: </li>
+
+```bash
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path('sync/', views.view_sync, name='sync'),
+    path('async/', views.view_async, name='async'),
+]
+```
+
+<li>Modify file async_sync/view.py with the views for async and sync routes</li>
+<li>Modify file hello/urls.py to include the new routes: </li>
+
+```bash
+path('async-sync/', include('async_sync.urls')),
+```
+
+<li>Run server and try the new routes, such as: http://127.0.0.1:8000/async-sync/sync/ and http://127.0.0.1:8000/async-sync/async/</li>
+
+Now we can see the differences between a Sync and Async routes!
+
+

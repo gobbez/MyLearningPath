@@ -18,11 +18,11 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 
 from hello import views
-from libreria import views as views_libreria
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', views.hello, name='hello'),
     path('libri/', include('libreria.urls')),
     path("i18n/", include("django.conf.urls.i18n")),
+    path('async-sync/', include('async_sync.urls')),
 ]
