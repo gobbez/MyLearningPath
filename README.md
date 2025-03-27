@@ -554,3 +554,29 @@ re_path('pdf/', views.libri_pdf, name='libri_pdf'),
 Now you can convert your html page in a pdf file!
 PLEASE NOTE: IF YOU ARE USING WINDOWS YOU ALSO NEED TO INSTALL GTK (gtk3-runtime-*.exe)
 
+
+<br>
+
+### Chapter 13 - Ajax
+
+<li>Modify file templates/base.html to create the base to let our code use Ajax: </li>
+
+```bash
+<head>
+    <title>{% block title %}Hello world!{% endblock %}</title>
+    {% block head %}{% endblock head %}
+</head>
+```
+
+<li>Modify file libreria/views.py adding a function search and results to create Ajax search</li>
+<li>Modify file libreria/urls.py to add the routes of our Ajax search: </li>
+
+```bash
+path('cerca/', views.cerca, name='libri_cerca'),
+path('risultati/', views.risultati, name='cerca_risultati'),
+```
+
+<li>Create file libreria/templates/libreria/cerca.html to use Ajax with javascript in our code</li>
+<li>Create file libreria/templates/libreria/risultati.html to show the results of our search</li>
+
+Now it's possible to search for a book or author and Ajax will show us the results in real-time!!

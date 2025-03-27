@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %} Cerca nella mia libreria{% endblock %}
+{% block head %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#cerca').on('keyup', function(){
+                var valore = $(this).val().trim();  // Rimuove gli spazi in eccesso
+                if (valore !== '') {
+                    $.ajax({
+                        url: "{% url 'cerca_risultati' %}",
+                        method: "GET",
+                        data: { cerca: valore },
+                        success: function(response){
+                            $('#lista_libri').html(response.html);  // Corretto per JsonResponse
+                        },
+                        error: function(xhr){
+                            console.log("Errore AJAX: " + xhr.status + " - " + xhr.statusText);
+                        }
+                    });
+                } else {
+                    $('#lista_libri').html('');  // Cancella i risultati se l'input è vuoto
+                }
+            });
+        });
+    </script>
+{% endblock head %}
+{% block content %}
+<div>
+    <h2>Cerca nella mia libreria</h2>
+    <input type="text" id="cerca" placeholder="Cerca libri o autori...">
+    <div id="lista_libri"></div>
+</div>
+{% endblock content %}
