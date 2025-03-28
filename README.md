@@ -580,3 +580,61 @@ path('risultati/', views.risultati, name='cerca_risultati'),
 <li>Create file libreria/templates/libreria/risultati.html to show the results of our search</li>
 
 Now it's possible to search for a book or author and Ajax will show us the results in real-time!!
+
+
+<br>
+
+### Chapter 14 - Real-time Comunication
+
+<li>Install Django Channels to execute Asycn protocols: </li>
+
+```bash
+pip install channels
+```
+
+<li>Add channels in INSTALLED_APPS of hello/settings.py</li>
+<li>Create a new application for our real-time web chat: </li>
+
+```bash
+python manage.py startapp webchat
+```
+
+<li>Create file webchat/urls.py: </li>
+
+```bash
+from django.urls import path
+from django.contrib.auth.views import LoginView
+from . import views
+
+urlpatterns = [
+    path("", views.webchat, name="webchat"),
+    path("login/", LoginView.as_view(template_name="webchat/login.html"), name="login"),
+]
+```
+
+<li>Update file hello/urls.py to include the new path</li>
+<li>Modify file webchat/views.py: </li>
+
+```bash
+from django.shortcuts import render, redirect
+from django.urls import reverse
+
+def webchat(request, *arg, **kwargs):
+    if not request.user.is_authenticated:
+        return redirect(f"{reverse('login')}?next={request.path}")
+    context = {}
+    return render(request, "webchat/webchat.html", context)
+```
+
+<li>Create file webchat/consumers.py to program our webchat</li>
+<li>Create file webchat/routing.py to pass the routes of our webchat</li>
+<li>Modify file hello/settings.py</li>
+<li>Modify file hello/asgi.py so that it can now work with http and websocket requests</li>
+<li>Create file and folder webchat/templates/webchat/login.html to generate a simple login form</li>
+<li>Create file webchat/templates/webchat/webchat.html to show our real-time webchat</li>
+
+<br>
+
+![Our Real-Time Webchat!](hello/webchat/webchat.jpg)
+
+As you can see, now we have created a real-time multi-users WebChat!!!

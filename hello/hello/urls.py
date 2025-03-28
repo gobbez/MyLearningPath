@@ -25,4 +25,5 @@ urlpatterns = [
     path('libri/', include('libreria.urls')),
     path("i18n/", include("django.conf.urls.i18n")),
     path('async-sync/', include('async_sync.urls')),
+    path('webchat/', include('webchat.urls')),
 ]

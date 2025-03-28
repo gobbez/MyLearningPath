@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Caro {{request.user}}, benvenuto!</h1>
+    <br>
+    <div id="webchat_discussione">
+        <input type="text" id="messaggio" />
+        <button type="submit" id="messaggio_invia_button">Invia</button>
+        <br>
+    </div>
+    <script>
+        const chatSocket = new WebSocket("ws://" + window.location.host + "/");
+        document.querySelector("#messaggio").focus();
+        document.querySelector("#messaggio").onkeyup = function (e) {
+            if (e.keyCode == 13) {
+                document.querySelector("#messaggio_invia_button").click();
+                }
+        };
+        document.querySelector("#messaggio_invia_button").onclick = function (e) {
+            var messaggioInput = document.querySelector("#messaggio").value;
+            chatSocket.send(JSON.stringify({ messaggio: messaggioInput, username: "{{request.user.username}}"}));
+        };
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            var div = document.createElement("div");
+            div.innerHTML = data.username + " : " + data.messaggio;
+            document.querySelector("#messaggio").value = "";
+            document.querySelector("#webchat_discussione").appendChild(div);
+        };
+    </script>
+</body>
+</html>
