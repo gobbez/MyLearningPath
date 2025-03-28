@@ -21,6 +21,7 @@ from hello import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('__debug__', include("debug_toolbar.urls")),
     path('hello/', views.hello, name='hello'),
     path('libri/', include('libreria.urls')),
     path("i18n/", include("django.conf.urls.i18n")),

@@ -584,7 +584,7 @@ Now it's possible to search for a book or author and Ajax will show us the resul
 
 <br>
 
-### Chapter 14 - Real-time Comunication
+### Chapter 14 - Real-time Communication
 
 <li>Install Django Channels to execute Asycn protocols: </li>
 
@@ -638,3 +638,82 @@ def webchat(request, *arg, **kwargs):
 ![Our Real-Time Webchat!](hello/webchat/webchat.jpg)
 
 As you can see, now we have created a real-time multi-users WebChat!!!
+
+
+<br>
+
+### Chapter 15 - Testing and Debugging
+
+<li>Update libreria/tests.py to let Django do a test on our Autore table: </li>
+
+```bash
+from django.test import TestCase
+from .models import Autore
+
+class AutoreTest(TestCase):
+    def test_(self):
+        Autore.objects.create(nome="John", cognome="Cleese")
+        self.assertEqual(len(Autore.objects.all()), 1)
+        self.assertEqual(Autore.objects.get(cognome="Cleese").nome, 'John')
+```
+
+<li>Execute test:</li>
+
+```bash
+python manage.py test
+```
+
+<li>Install Selenium: </li>
+
+```bash
+pip install selenium
+```
+
+<li>Add our unit test on hello/settings.py: </li>
+
+```bash
+pip install selenium
+```
+
+<li>Update file webchat/tests.py to create an automatism that makes our webchat talk with itself</li>
+<li>Execute our webchat test: </li>
+
+```bash
+python manage.py test webchat
+```
+
+<li>Install Django-debug-toolbar: </li>
+
+```bash
+pip install django-debug-toolbar
+```
+
+<li>Create Django Debug Toolbar adding it in INSTALLED_APPS, MIDDLEWARE and INTERNAL_IPS of hello/settings.py: </li>
+
+```bash
+INSTALLED_APPS = [
+    ...
+    'debug_toolbar',
+    ...
+]
+
+MIDDLEWARE = [
+    ...
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    ...
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+```
+
+<li>Add the route in hello/urls.py: </li>
+
+```bash
+path('__debug__', include("debug_toolbar.urls")),
+```
+
+Now we can see the cool Django Debug Toolbar in our local server!
+
