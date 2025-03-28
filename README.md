@@ -742,4 +742,34 @@ def bibliografico(autore):
 <li>Create a new block-tag that shows Wikipedia pages that talk about our book(s) using Django cache. Create file libreria/templatetags/wikipedia.py</li>
 <li>Update file libreria/template/libri.html to add our Wikipedia search</li>
 
+<br>
 Now in our http://127.0.0.1:8000/libri/ we can see the first Wikipedia results for our books!
+
+
+<br>
+
+### Chapter 17 - Cookies and sessions
+
+<li>Show cookies in console (when urls 'libri' is called), changing function libri in libreria/views.py: </li>
+
+```bash
+from .helpers import log_colorato
+
+def libri(request):
+    # Show cookies in console
+    log_colorato("COOKIE: \n")
+    for cookie, valore in request.COOKIES.items():
+        log_colorato(f"{cookie}: {valore}\n")
+
+    context = {'libri': Libro.objects.all().order_by('titolo')}
+    return render(request, "libri.html", context)
+```
+
+<li>Create file libreria/templates/libreria/libro.html</li>
+<li>Create file libreria/templates/libreria/storia.html</li>
+<li>Update file templates/base.html</li>
+<li>Update libreria/templates/libreria/libri.html</li>
+<li>Update libreria/urls.py</li>
+<li>Update libreria/views.py</li>
+<br>
+Now whenever you click on a book, it will appear in your "history" (Storia)!

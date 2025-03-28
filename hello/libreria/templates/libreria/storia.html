@@ -1,0 +1,20 @@
+{% if libri_visitati %}
+    <a href="#" id="mostra_storia">Storia</a>
+    <div id="libri_visitati" style="display:none;">
+        <dl>
+            {% for pk, titolo in libri_visitati.items %}
+                <dd>
+                    <a href="{% url 'libri_libro' pk=pk %}"><strong>{{ titolo }}</strong></a>
+                </dd>
+            {% endfor %}
+        </dl>
+    </div>
+{% endif %}
+<script>
+    $(document).ready(function() {
+        $("#mostra_storia").click(function(e) {
+            e.preventDefault();
+            $("#libri_visitati").toggle();
+        });
+    });
+</script>

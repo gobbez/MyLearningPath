@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load filtri wikipedia %}
+{% block title %}La mia libreria{% endblock %}
+{% block content %}
+<h1><a href="/libri/">La mia libreria</a></h1>
+<h2>Libro: {{ libro }}</h2>
+<dl>
+    <dd>
+        <em>
+            <a href="{% url 'libri_autore' pk=libro.autore.id %}">{{ libro.autore|bibliografico }}</a>
+        </em> - <a href="{% url 'libri_genere' pk=libro.genere.id %}">{{ libro.genere }}</a>
+    </dd>
+    <dd>
+        <small>acquistato nel {{ libro.data_acquisto|date:"F \d\e\l Y" }}</small>
+    </dd>
+</dl>
+{% include "libreria/storia.html" %}
+{% endblock content %}

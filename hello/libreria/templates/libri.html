@@ -12,7 +12,7 @@
 {% endif %}
 <dl>
 {% for libro in libri %}
-    <dt><strong>"{{ libro.titolo }}"</strong>
+    <dt><a href="{% url 'libri_libro' pk=libro.pk %}"><strong>"{{ libro.titolo }}"</strong></a>
     {% if user.is_staff %}
         <a href="{% url 'admin:libreria_libro_change' libro.pk %}">[E]</a>
     {% endif %}
@@ -28,4 +28,5 @@
     </ul></dd>
 {% endfor %}
 </dl>
+{% include "libreria/storia.html" %}
 {% endblock content %}

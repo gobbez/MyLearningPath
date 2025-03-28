@@ -9,6 +9,7 @@ urlpatterns = [
     re_path('^autore/(?P<pk>\d+)/$', views.libri_autore, name='libri_autore'),
     re_path('^genere/(?P<pk>\d+)/$', views.libri_genere, name='libri_genere'),
     re_path('^ricerca/$', views_wiki.ricerca, name='libri_ricerca'),
+    re_path('^libro/(?P<pk>\d+)/$', views.libro, name='libri_libro'),
     path('cerca/', views.cerca, name='libri_cerca'),
     path('risultati/', views.risultati, name='cerca_risultati'),
 ]
