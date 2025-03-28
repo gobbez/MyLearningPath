@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load filtri wikipedia %}
 {% block title %}La mia libreria{% endblock %}
 {% block content %}
 
@@ -16,9 +17,15 @@
         <a href="{% url 'admin:libreria_libro_change' libro.pk %}">[E]</a>
     {% endif %}
     </dt>
-    <dd><em><a href="{% url 'libri_autore' pk=libro.autore.id %}"> {{ libro.autore }}</a></em>
+    <dd><em><a href="{% url 'libri_autore' pk=libro.autore.id %}"> {{ libro.autore|bibliografico }}</a></em>
         - <a href="{% url 'libri_genere' pk=libro.genere.id %}">{{ libro.genere }}</a></dd>
     <dd><small>acquistato nel {{ libro.data_acquisto|date:"F \d\e\l Y"}}</small></dd>
+    <dd><ul>
+        {% get_wikipedia_info for libro as pagine_wiki %}
+        {% for pagina in pagine_wiki %}
+            <li><a href="{{ pagina.url }}">{{ pagina.title }}</a></li>
+        {% endfor %}
+    </ul></dd>
 {% endfor %}
 </dl>
 {% endblock content %}

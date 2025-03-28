@@ -717,3 +717,29 @@ path('__debug__', include("debug_toolbar.urls")),
 
 Now we can see the cool Django Debug Toolbar in our local server!
 
+
+<br>
+
+### Chapter 16 - Personalized Tags and Filters
+
+<li>Create a new personalized filter and folder in hello/libreria/templatetags/filtri.py: </li>
+
+```bash
+from django import template
+from django.utils.safestring import mark_safe
+from django.utils.html import conditional_escape
+register = template.Library()
+
+@register.filter
+def bibliografico(autore):
+    return mark_safe(
+        f"<strong>{conditional_escape(autore.cognome)}</strong>, "
+        f"{conditional_escape(autore.nome)}"
+    )
+```
+
+<li>Modify file libreria/templates/libri.html to include our filter (to show Autori's surname-name)</li>
+<li>Create a new block-tag that shows Wikipedia pages that talk about our book(s) using Django cache. Create file libreria/templatetags/wikipedia.py</li>
+<li>Update file libreria/template/libri.html to add our Wikipedia search</li>
+
+Now in our http://127.0.0.1:8000/libri/ we can see the first Wikipedia results for our books!
