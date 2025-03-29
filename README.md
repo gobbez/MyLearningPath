@@ -32,6 +32,9 @@ Feel free to clone this repo!
 - [Chapter 19. Social Authentication](#chapter-19-social-authentication)
 - [Chapter 20. Web Security](#chapter-20-web-security)
 - [Chapter 21. HTMX](#chapter-21-htmx)
+- [Useful Resources](#useful-resources)
+- [Insights. Appendix A](#insights-appendix-a)
+- [Insights. Appendix B](#insights-appendix-b)
 
 
 ## Step-By-Step Learning
@@ -972,3 +975,35 @@ def risultati_htmx(request):
 
 Now in the route http://127.0.0.1:8000/libri/cerca_htmx/ you can search for books using HTMX!
 
+
+<br>
+
+### Useful Resources
+
+Here you can find some useful Django resources:
+<li>List of Django Packages that you can use in your own project: https://djangopackages.org/ </li>
+<li>List of Django Code Snippets already created: https://www.djangosnippets.org/ </li>
+<li>Monty Python: http://www.youtube.com/MontyPython </li>
+
+
+<br>
+
+### Insights. Appendix A
+
+<li>Theory of different Django applications, from Cloud to AI to frontend integration... </li>
+
+
+<br>
+
+### Insights. Appendix B
+
+<li>Install module re</li>
+
+```bash
+pip install re
+```
+
+<li>Some code and explanations about Regex in Python (with module re)</li>
+
+<br>
+I hope this book can help improve your Python Django skills!!!
