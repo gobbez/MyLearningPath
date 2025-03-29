@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Cerca nella mia libreria{% endblock %}
+{% block head %}
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% endblock head %}
+
+{% block content %}
+    <h1>Ricerca Libri</h1>
+    <form hx-get="{% url 'risult_htmx' %}"
+          hx-trigger="keyup delayed:500ms"
+          hx-target="#risultati-ricerca">
+        <input type="text" name="q" placeholder="Cerca libri...">
+    </form>
+    <br>
+    <div id="risultati-ricerca"></div>
+{% endblock content %}

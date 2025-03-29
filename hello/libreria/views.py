@@ -94,3 +94,19 @@ class LibriListView(ListView):
         context = super().get_context_data(**kwargs)
         return aggiungi_storia(self.request, context=context)
 
+
+def cerca_htmx(request):
+    return render(request, 'libreria/cerca_htmx.html')
+
+def risultati_htmx(request):
+    query = request.GET.get('q', '')
+    if query:
+        risultati = Libro.objects.filter(
+            Q(titolo__icontains=query) |
+            Q(titolo__icontains=query) |
+            Q(autore__cognome__icontains=query) |
+            Q(autore__nome__icontains=query)
+        )
+    else:
+        risultati = []
+    return render(request, 'libreria/risultati.html', {'libri': risultati})

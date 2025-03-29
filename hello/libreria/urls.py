@@ -12,4 +12,6 @@ urlpatterns = [
     re_path('^libro/(?P<pk>\d+)/$', views.libro, name='libri_libro'),
     path('cerca/', views.cerca, name='libri_cerca'),
     path('risultati/', views.risultati, name='cerca_risultati'),
+    path('cerca_htmx/', views.cerca_htmx, name='cerca_htmx'),
+    path('risult_htmx/', views.risultati_htmx, name='risult_htmx'),
 ]

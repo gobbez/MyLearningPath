@@ -31,6 +31,7 @@ Feel free to clone this repo!
 - [Chapter 18. Pagination](#chapter-18-pagination)
 - [Chapter 19. Social Authentication](#chapter-19-social-authentication)
 - [Chapter 20. Web Security](#chapter-20-web-security)
+- [Chapter 21. HTMX](#chapter-21-htmx)
 
 
 ## Step-By-Step Learning
@@ -918,3 +919,56 @@ Now you can use Google (or other social apps to login in your Django application
 ### Chapter 20. Web Security
 
 <li>Theory of different best practices for web security</li>
+
+
+<br>
+
+### Chapter 21. HTMX
+
+<li>Update file libreria/urls.py to include two new routes that uses HTMX: </li>
+
+```bash
+    path('cerca_htmx/', views.cerca_htmx, name='cerca_htmx'),
+    path('risult_htmx/', views.risultati_htmx, name='risult_htmx'),
+```
+
+<li>Update file libreria/views.py to include the two new routes: </li>
+
+```bash
+def risultati_htmx(request):
+    query = request.GET.get('q', '')
+    if query:
+        risultati = Libro.objects.filter(
+            Q(titolo__icontains=query) |
+            Q(titolo__icontains=query) |
+            Q(autore__cognome__icontains=query) |
+            Q(autore__nome__icontains=query)
+        )
+    else:
+        risultati = []
+    return render(request, 'libreria/risultati.html', {'libri': risultati})
+```
+
+<li>Create new file libreria/templates/libreria/cerca_htmx.html: </li>
+
+```bash
+{% extends "base.html" %}
+{% block title %}Cerca nella mia libreria{% endblock %}
+{% block head %}
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% endblock head %}
+
+{% block content %}
+    <h1>Ricerca Libri</h1>
+    <form hx-get="{% url 'risult_htmx' %}"
+          hx-trigger="keyup delayed:500ms"
+          hx-target="#risultati-ricerca">
+        <input type="text" name="q" placeholder="Cerca libri...">
+    </form>
+    <br>
+    <div id="risultati-ricerca"></div>
+{% endblock content %}
+```
+
+Now in the route http://127.0.0.1:8000/libri/cerca_htmx/ you can search for books using HTMX!
+
