@@ -859,3 +859,54 @@ class LibriListView(ListView):
 ```
 
 Now our route http://127.0.0.1:8000/libri/ has the pagination, showing 2 books per page!
+
+
+<br>
+
+### Chapter 19. Social Authentication
+
+<li>Install package django-allauth that enables other social apps to be used as login in our application: </li>
+
+```bash
+pip install django-allauth
+pip install jwt
+```
+
+<li>Update file settings.py: </li>
+
+```bash
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+INSTALLED_APPS = [
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    ...
+
+...
+LOGIN_REDIRECT_URL = '/libri/'
+```
+
+<li>Add the two new routes in hello/urls.py: </li>
+
+```bash
+...
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.socialaccounts.urls')),
+```
+
+<li>Execute migrate command to add the tables for this: </li>
+
+```bash
+python manage.py migrate
+```
+
+<li>Create the OAuth2 API for registration and login from Google Developer Console (or other social app)</li>
+<li>Create a file secrets.py with the SOCIALACCOUNT_PROVIDERS with your API keys and add it in settings.py (never share this secrets.py!)</li>
+
+Now you can use Google (or other social apps to login in your Django application)!!
+
