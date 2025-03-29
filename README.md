@@ -29,6 +29,8 @@ Feel free to clone this repo!
 - [Chapter 16. Personalized Tags and Filters](#chapter-16-personalized-tags-and-filters)
 - [Chapter 17. Cookies and sessions](#chapter-17-cookies-and-sessions)
 - [Chapter 18. Pagination](#chapter-18-pagination)
+- [Chapter 19. Social Authentication](#chapter-19-social-authentication)
+- [Chapter 20. Web Security](#chapter-20-web-security)
 
 
 ## Step-By-Step Learning
@@ -910,3 +912,9 @@ python manage.py migrate
 
 Now you can use Google (or other social apps to login in your Django application)!!
 
+
+<br>
+
+### Chapter 20. Web Security
+
+<li>Theory of different best practices for web security</li>
