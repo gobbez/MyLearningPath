@@ -10,6 +10,27 @@ The book will start from the very basics to an advanced level.
 
 Feel free to clone this repo!
 
+### Table of Contents
+- [Chapter 1. Install Django + "Hello World"](#chapter-1-install-django--hello-world)
+- [Chapter 2. Database, ORM, Model](#chapter-2-database-orm-model)
+- [Chapter 3. Admin](#chapter-3-admin)
+- [Chapter 4. Url](#chapter-4-url)
+- [Chapter 5. Templates](#chapter-5-templates)
+- [Chapter 6. Forms](#chapter-6-forms)
+- [Chapter 7. Query](#chapter-7-query)
+- [Chapter 8. Security and Permissions](#chapter-8-security-and-permissions)
+- [Chapter 9. Internationalization](#chapter-9-internationalization)
+- [Chapter 10. Signals](#chapter-10-signals)
+- [Chapter 11. Async Vs Sync](#chapter-11-async-vs-sync)
+- [Chapter 12 - How to generate PDF files](#chapter-12-how-to-generate-pdf-files)
+- [Chapter 13 - Ajax](#chapter-13-ajax)
+- [Chapter 14. Real-time Communication](#chapter-14-real-time-communication)
+- [Chapter 15. Testing and Debugging](#chapter-15-testing-and-debugging)
+- [Chapter 16. Personalized Tags and Filters](#chapter-16-personalized-tags-and-filters)
+- [Chapter 17. Cookies and sessions](#chapter-17-cookies-and-sessions)
+- [Chapter 18. Pagination](#chapter-18-pagination)
+
+
 ## Step-By-Step Learning
 
 ### Chapter 1. Install Django + "Hello World"
@@ -521,7 +542,7 @@ Now we can see the differences between a Sync and Async routes!
 
 <br>
 
-### Chapter 12 - How to generate PDF files
+### Chapter 12. How to generate PDF files
 
 <li>Install Weasyprint module: </li>
 
@@ -557,7 +578,7 @@ PLEASE NOTE: IF YOU ARE USING WINDOWS YOU ALSO NEED TO INSTALL GTK (gtk3-runtime
 
 <br>
 
-### Chapter 13 - Ajax
+### Chapter 13. Ajax
 
 <li>Modify file templates/base.html to create the base to let our code use Ajax: </li>
 
@@ -584,7 +605,7 @@ Now it's possible to search for a book or author and Ajax will show us the resul
 
 <br>
 
-### Chapter 14 - Real-time Communication
+### Chapter 14. Real-time Communication
 
 <li>Install Django Channels to execute Asycn protocols: </li>
 
@@ -642,7 +663,7 @@ As you can see, now we have created a real-time multi-users WebChat!!!
 
 <br>
 
-### Chapter 15 - Testing and Debugging
+### Chapter 15. Testing and Debugging
 
 <li>Update libreria/tests.py to let Django do a test on our Autore table: </li>
 
@@ -720,7 +741,7 @@ Now we can see the cool Django Debug Toolbar in our local server!
 
 <br>
 
-### Chapter 16 - Personalized Tags and Filters
+### Chapter 16. Personalized Tags and Filters
 
 <li>Create a new personalized filter and folder in hello/libreria/templatetags/filtri.py: </li>
 
@@ -746,9 +767,9 @@ def bibliografico(autore):
 Now in our http://127.0.0.1:8000/libri/ we can see the first Wikipedia results for our books!
 
 
-<br>
+<br><br>
 
-### Chapter 17 - Cookies and sessions
+### Chapter 17. Cookies and sessions
 
 <li>Show cookies in console (when urls 'libri' is called), changing function libri in libreria/views.py: </li>
 
@@ -773,3 +794,68 @@ def libri(request):
 <li>Update libreria/views.py</li>
 <br>
 Now whenever you click on a book, it will appear in your "history" (Storia)!
+
+
+<br>
+
+### Chapter 18. Pagination
+
+<li>Create a new view in hello/libreria/views.py: </li>
+
+```bash
+...
+from django.views.generic import ListView
+from django.core.paginator import Paginator
+
+...
+def libri(request):
+    log_colorato("COOKIE: \n")
+    for cookie, valore in request.COOKIES.items():
+        log_colorato(f"{cookie}: {valore}\n")
+
+    libri_qs = Libro.objects.all().order_by('titolo')
+
+    # Aggiungere paginazione
+    paginator = Paginator(libri_qs, 2)  # 2 libri per pagina
+    page = request.GET.get('page')
+    libri = paginator.get_page(page)
+
+    context = {'libri': libri}
+    context = aggiungi_storia(request, context=context)
+    return render(request, "libri.html", context)
+
+...
+
+class LibriListView(ListView):
+    model = Libro
+    template_name = "libreria/libri.html"
+    paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return aggiungi_storia(self.request, context=context)
+```
+
+<li>Update libreria/templates/libri.html: </li>
+
+```bash
+...
+<div class="pagination">
+    <span class="step-links">
+        {% if libri.has_previous %}
+            <a href="?page=1">&laquo; prima</a>
+            <a href="?page={{ libri.previous_page_number }}">precedente</a>
+        {% endif %}
+        <span class="current">
+            Pagina {{ libri.number }} di {{ libri.paginator.num_pages }}.
+        </span>
+        {% if libri.has_next %}
+            <a href="?page={{ libri.next_page_number }}">seguente</a>
+            <a href="?page={{ libri.paginator.num_pages }}">ultima &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+...
+```
+
+Now our route http://127.0.0.1:8000/libri/ has the pagination, showing 2 books per page!

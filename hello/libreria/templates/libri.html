@@ -28,5 +28,22 @@
     </ul></dd>
 {% endfor %}
 </dl>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if libri.has_previous %}
+            <a href="?page=1">&laquo; prima</a>
+            <a href="?page={{ libri.previous_page_number }}">precedente</a>
+        {% endif %}
+        <span class="current">
+            Pagina {{ libri.number }} di {{ libri.paginator.num_pages }}.
+        </span>
+        {% if libri.has_next %}
+            <a href="?page={{ libri.next_page_number }}">seguente</a>
+            <a href="?page={{ libri.paginator.num_pages }}">ultima &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+<br>
 {% include "libreria/storia.html" %}
 {% endblock content %}

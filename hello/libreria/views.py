@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
+from django.views.generic import ListView
+from django.core.paginator import Paginator
 from .models import *
 from .helpers import log_colorato
 
@@ -17,12 +19,18 @@ def aggiungi_storia(request, context={}, libro=None):
 
 
 def libri(request):
-    # Show cookies in console
     log_colorato("COOKIE: \n")
     for cookie, valore in request.COOKIES.items():
         log_colorato(f"{cookie}: {valore}\n")
 
-    context = {'libri': Libro.objects.all().order_by('titolo')}
+    libri_qs = Libro.objects.all().order_by('titolo')
+
+    # Aggiungere paginazione
+    paginator = Paginator(libri_qs, 2)  # 2 libri per pagina
+    page = request.GET.get('page')
+    libri = paginator.get_page(page)
+
+    context = {'libri': libri}
     context = aggiungi_storia(request, context=context)
     return render(request, "libri.html", context)
 
@@ -76,3 +84,13 @@ def risultati(request):
         return JsonResponse({'html': html})  # Restituisce JSON valido
 
     return JsonResponse({'error': 'Richiesta non valida'}, status=400)
+
+class LibriListView(ListView):
+    model = Libro
+    template_name = "libreria/libri.html"
+    paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return aggiungi_storia(self.request, context=context)
+
