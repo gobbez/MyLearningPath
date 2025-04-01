@@ -6,6 +6,7 @@
 
 ### Table of Contents
 - [Chapter 1. What is Deep Learning](#chapter-1-what-is-deep-learning)
+- [Chapter 2. Before we Start: Basic Math for Neural Networks](#chapter-2-before-we-start-basic-math-for-neural-networks)
 
 
 ## Step-By-Step Learning
@@ -18,7 +19,7 @@ This is a simple schema on how the deep learning mechanism works:
 ![alt text](dlprocess.jpg "Deep Learning Process")
 
 
-### Chapter 2 - Before we Start: Basic Math for Neural Networks
+### Chapter 2. Before we Start: Basic Math for Neural Networks
 In this chapter we will study some basic math to better understand Neural Networks.
 The book tries to explain the concepts using Python Numpy instead of pure Math.
 
