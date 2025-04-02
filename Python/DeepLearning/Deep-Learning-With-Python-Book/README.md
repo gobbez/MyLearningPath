@@ -7,6 +7,7 @@
 ### Table of Contents
 - [Chapter 1. What is Deep Learning](#chapter-1-what-is-deep-learning)
 - [Chapter 2. Before we Start: Basic Math for Neural Networks](#chapter-2-before-we-start-basic-math-for-neural-networks)
+- [Chapter 3. Introduction to Neural Networks](#chapter-3-introduction-to-neural-networks)
 
 
 ## Step-By-Step Learning
@@ -82,3 +83,19 @@ x = np.array([[[5,78,2,34,0],
 
 <br>
 The book continues with other examples and methods to work with Tensors and more advanced Math concepts.
+
+
+<br>
+
+### Chapter 3. Introduction to Neural Networks
+
+This chapter starts to explain how to use Keras, how to setup an environment and there are a few examples of different Deep Learning codes for classification and regression.
+
+Files created:
+
+- [Files/imdb.py](files/imdb.py) = Predict Internet Movie Recensions (Classification)
+- [Files/reuters.py](files/reuters.py) = Predict '86 Agency Work-Sectors (Classification)
+- [Files/bostonhousing.py](files/bostonhousing.py) - Predict Boston '70 House Prices (Regression)
+
+<br>
+Now we have seen some Deep Learning models for classification and regression using Keras!
