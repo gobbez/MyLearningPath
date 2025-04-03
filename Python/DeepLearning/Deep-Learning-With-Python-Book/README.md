@@ -8,6 +8,7 @@
 - [Chapter 1. What is Deep Learning](#chapter-1-what-is-deep-learning)
 - [Chapter 2. Before we Start: Basic Math for Neural Networks](#chapter-2-before-we-start-basic-math-for-neural-networks)
 - [Chapter 3. Introduction to Neural Networks](#chapter-3-introduction-to-neural-networks)
+- [Chapter 4. Machine Learning Fondamentals](#chapter-4-machine-learning-fondamentals)
 
 
 ## Step-By-Step Learning
@@ -99,3 +100,47 @@ Files created:
 
 <br>
 Now we have seen some Deep Learning models for classification and regression using Keras!
+
+
+<br>
+
+### Chapter 4. Machine Learning Fondamentals
+
+In this chapter we learned the 4 different types of Machine Learning:
+<li>Supervised Learning</li>
+<li>Unsupervised Learning</li>
+<li>Auto-Supervised Learning</li>
+<li>Reinforced Learning</li>
+
+<br>
+
+We have seen some protocols for model evaluation:
+<li>Hold-Out</li>
+<li>K-fold</li>
+<li>K-fold with shuffling</li>
+
+<br>
+
+Then we have seen some data pre-elaboration:
+<li>Vectorization</li>
+<li>Values Normalization</li>
+<li>Missing data handling</li>
+
+<br>
+
+The book explained some methods to avoid Overfitting or Underfitting:
+<li>Reduce network dimension</li>
+<li>Weights Regularization</li>
+<li>Use Dropout</li>
+
+<br>
+
+Finally, we learned a common path to follow when dealing with Machine Learning:
+<li>Define problem and create/find dataset</li>
+<li>Select the evaluation param (example: accuracy or roc auc curve..)</li>
+<li>Find an evaluation protocol</li>
+<li>Prepare data</li>
+<li>Create a model that performs better than a random one</li>
+<li>Create a model that does Overfit</li>
+<li>Regularize the model and optimize hyperparams</li>
+<li>Test your model</li>
