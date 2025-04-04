@@ -10,6 +10,7 @@
 - [Chapter 3. Introduction to Neural Networks](#chapter-3-introduction-to-neural-networks)
 - [Chapter 4. Machine Learning Fondamentals](#chapter-4-machine-learning-fondamentals)
 - [Chapter 5. Deep Learning for computer vision](#chapter-5-deep-learning-for-computer-vision)
+- [Chapter 6. Deep Learning for text and sequences](#chapter-6-deep-learning-for-text-and-sequences)
 
 
 ## Step-By-Step Learning
@@ -223,6 +224,7 @@ Now our accuracy increased to 97%!
 <br>
 
 **Visualize middle activations**
+
 The book shows how to visualize the middle activations of a convnet, showing the images (or the part of the images) that the net is processing, step-by-step. 
 <br>
 Then it shows how to see filters of a convnet and show the parts of the image that best activates the layers.
@@ -231,3 +233,81 @@ Then it shows how to see filters of a convnet and show the parts of the image th
 For a general guide you can see this code:
 
 - [Files/convnet.py](files/convnet.py) = Some code explained in Chapter 5, using convnet
+
+
+<br>
+
+### Chapter 6. Deep Learning for text and sequences
+
+<br>
+
+**Tokenizer and Embedding**
+
+This chapter explains how to create neural networks for text and sequences. It shows some one-hot-encoding methods, with Tokenizer:
+
+```bash
+from keras.preprocessing.text import Tokenizer
+```
+
+It shows the word-embedding method, with the layer Embedding:
+
+```bash
+from keras.layers import Embedding
+```
+
+It explains how to use pre-trained word-embedding layers, for example the GloVe.
+
+<br>
+
+**Recurrent Neural Network (RNN)**
+
+Recurrent Neural Network are used for sequences and text and it shows how to use SimpleRNN, mixing Embedding and SimpleRNN.
+
+```bash
+from keras.layers import SimpleRNN
+```
+
+<br>
+
+**Other layers for text and sequences: LSTM - GRU**
+
+It shows how to create a neural network using LSTM or GRU.
+
+```bash
+from keras.layers import LSTM
+```
+
+<br>
+
+**Temperature prediction**
+
+An example on how to create a model for temperature predictions, guiding step-by-step:
+
+<li>Download data and Prepare it</li>
+<li>Create some simple "good sense" approach to see if your future model will outperform this. You can do so even without Machine-Learning, for example calculating Mean Absolute Error of your data and see if you can have better results than this value with your model.</li>
+<li>Create a simple neural network, the most basic, using Dense layers and see how it performs.</li>
+<li>Use Recurrent layer(s) to see if those achieve a better performance.</li>
+<li>Add dropout to defeat overfit</li>
+<li>Add more layers to increase network strength.</li>
+<li>Check results and modify what lacks.</li>
+
+<br>
+
+**Bidirectional RNN**
+
+It shows how to create a bidirectional RNN, using the Bidirectional layer:
+
+```bash
+from keras.layers import Bidirectional
+```
+
+<br>
+
+**Conv net 1D**
+
+It explain the existence of 1D Convolutional Networks (previously we have used Conv2D) and it's MaxPooling1D. 
+<br>
+It then mixes everything we learned in this chapter to create a neural network.
+
+<br>
+We have seen other layers that we can use in our Keras models!
