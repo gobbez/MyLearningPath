@@ -1,5 +1,5 @@
 # DeepLearningBook
-**Deep Learning with Python** is a great book, written by F. Chollet the co-founder of Keras. It starts with theory and explanations and it will show code and practice in order to build your own Deep Learning model.
+**Deep Learning with Python** is a great book, written by F. Chollet the founder of Keras. It starts with theory and explanations and it will show code and practice in order to build your own Deep Learning model.
 
 ![alt text](book.jpg "Deep Learning con Python")
 
@@ -13,6 +13,7 @@
 - [Chapter 6. Deep Learning for text and sequences](#chapter-6-deep-learning-for-text-and-sequences)
 - [Chapter 7. Best practices for advanced Deep Learning](#chapter-7-best-practices-for-advanced-deep-learning)
 - [Chapter 8. Generative Deep Learning](#chapter-8-generative-deep-learning)
+- [Chapter 9. Conclusions](#chapter-9-conclusions)
 
 
 ## Step-By-Step Learning
@@ -466,3 +467,179 @@ Talking about GAN, it shows how to implement the Generator and the Discriminator
 
 <br>
 This chapter shows how to generate new text from other text and explains what VAE and GAN are and how to use them with Keras!
+
+
+<br>
+
+### Chapter 9. Conclusions
+
+This final chapter reviews the concepts studied in the book.
+
+<li>What makes Deep Learning so special?</li>
+<li>How to approach Deep Learning</li>
+<li>Key technologies</li>
+<li>Common schema to use when working with Deep Learning (see Ch. 4)</li>
+
+<br>
+Then it shows the main models to use:
+
+<br>
+
+**Densely Connected Networks (DENSE)**
+
+A densely connected network is a pile of Dense layers to elaborate vector data. 
+<br>
+This network doesn't have any specific structure in its input architecture: every layers if fully connected with the others.
+<br>
+
+CLASSIFICATION - BINARY
+
+```bash
+from keras import models
+from keras import layers
+
+model = models.Sequential()
+model.add(layers.Dense(32, activation='relu', input_shape=(num_input_features, )))
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy')
+```
+
+<br>
+
+CLASSIFICATION - SINGLE-LABEL
+
+```bash
+from keras import models
+from keras import layers
+
+model = models.Sequential()
+model.add(layers.Dense(32, activation='relu', input_shape=(num_input_features, )))
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(num_classes, activation='softmax'))
+
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+# If int you can use loss='sparse_categorical_crossentropy' instead
+```
+
+<br>
+
+CLASSIFICATION - MULTI-LABEL
+
+```bash
+from keras import models
+from keras import layers
+
+model = models.Sequential()
+model.add(layers.Dense(32, activation='relu', input_shape=(num_input_features, )))
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(num_classes, activation='sigmoid'))
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy')
+```
+
+<br>
+
+REGRESSION - CONTINUOUS VALUES
+
+```bash
+from keras import models
+from keras import layers
+
+model = models.Sequential()
+model.add(layers.Dense(32, activation='relu', input_shape=(num_input_features, )))
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(num_classes))
+
+model.compile(optimizer='rmsprop', loss='mse')
+# You can use MSE or MAE or other metrics
+```
+
+<br>
+
+**Convolution Layers (CONVNET)**
+
+Convolutions layers search local patterns from spacial point-of-view, applying the same transformation to different spatial positions (patch).
+<br>
+This network are very effective in data elaboration and modularity. 
+<br>
+<li>Conv1D: useful for sequences (like text)</li>
+<li>Conv2D: useful for images</li>
+<li>Conv3D: useful for volumes (like videos)</li>
+<br>
+These networks must use Pooling layer(s) to sub-sample the data (and reduce their size) and usually they end with Dense layer(s) and before them a Flatten() layer of a GlobalAveragePooling() layer.
+
+<br>
+However, these networks are replaced by Depth Separable Convolution layers (SeparableConv2D) since this is faster and more efficient.
+
+
+CONV - IMAGE CLASSIFICATION
+
+```bash
+from keras import models
+from keras import layers
+
+model = models.Sequential()
+model.add(layers.SeparableConv2D(32, 3, activation='relu', input_shape=(height, width, channels)))
+model.add(layers.SeparableConv2D(64, 3, activation='relu'))
+model.add(layers.MaxPooling2D(2))
+model.add(layers.SeparableConv2D(64, 3, activation='relu'))
+model.add(layers.SeparableConv2D(128, 3, activation='relu'))
+model.add(layers.GlobalAveragePooling2D())  
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(num_classes, activation='softmax'))
+
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+
+# You may use Flatten() instead of GlobalAveragePooling2D()
+```
+
+<br>
+
+**Recurrent Neural Network (RNN)**
+
+This network elaborates a single timestep input at time while keeping a state (a vector or list of vectors, a point in the states-space)
+<br>
+This network performs better than Conv1D for time-series where the recent-past is more important than long-past.
+<br>
+There are three possible RNN layers in Keras:
+<li>SimpleRNN: the simplest RNN</Li>
+<li>LSTM: the strongest RNN, but slower</li>
+<li>GRU: a simpler LSTM and less expensive</li>
+
+<br>
+
+BINARY CLASSIFICATION FOR VECTOR SEQUENCES - LSTM
+
+```bash
+from keras import models
+from keras import layers
+
+model = models.Sequential()
+model.add(layers.LSTM(32, return_sequences=True, input_shape=(num_timesteps, num_features)))
+model.add(layers.LSTM(32, return_sequences=True))
+model.add(layers.LSTM(32))
+model.add(layers.Dense(num_classes, activation='sigmoid'))
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy')
+```
+
+
+<br>
+
+The book procedes with other explanations:
+<li>Space of Possibilities for Deep Learning</li>
+<li>Deep Learning limits</li>
+<li>Deep Learning risks</li>
+<li>Local Generalization VS Extreme Generalization</li>
+
+Them, the author explains his point of view for the future of Deep Learning.
+<br>
+Finally, some last methods to staying up-to-date and improve in Deep Learning:
+<li>Practice on Kaggle</li>
+<li>Watch last achievements in arXiv or arXiv Sanity Preserver websites</li>
+<li>Explore Keras</li>
+
+<br>
+This final chapter concentrates everything we learned so far, with some words from the author (founder of Keras)!
