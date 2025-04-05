@@ -12,6 +12,7 @@
 - [Chapter 5. Deep Learning for computer vision](#chapter-5-deep-learning-for-computer-vision)
 - [Chapter 6. Deep Learning for text and sequences](#chapter-6-deep-learning-for-text-and-sequences)
 - [Chapter 7. Best practices for advanced Deep Learning](#chapter-7-best-practices-for-advanced-deep-learning)
+- [Chapter 8. Generative Deep Learning](#chapter-8-generative-deep-learning)
 
 
 ## Step-By-Step Learning
@@ -432,4 +433,36 @@ The book shows some advanced techniques to improve your models, such as:
 <li>Hyperparameters Fine-Tuning</li>
 <li>Model assembly</li>
 
+<br>
 This chapter shows some cool and advanced techniques to improve the quality of your neural networks!
+
+
+<br>
+
+### Chapter 8. Generative Deep Learning
+
+The book shows how to generate new content with Generative Deep Learning.
+
+<br>
+
+**Text generation with LSTM**
+
+In the example we see how to create a LSTM model that generates new text, starting from Nietzsche text from Wikipedia
+
+- [Files/LSTM_gen_text.py](files/LSTM_gen_text.py) = Simple LSTM model that generates text
+
+<br>
+The books then shows some other models for Generative Deep Learning, such as DeepDream and how to implement it with Keras.
+<br>
+It shows some techniques for style transfer, in order to apply the "style" of an image to another image, and how to do it with Keras.
+
+<br>
+
+**Variational Autoencoder (VAE) and Generative Adversarial Network (GAN)**
+
+It explains what VAE and GAN are, how they works, their differences and how to implement them with Keras.
+<br>
+Talking about GAN, it shows how to implement the Generator and the Discriminator: two different neural networks that must be used in a GAN model in order to create a DCGAN network.
+
+<br>
+This chapter shows how to generate new text from other text and explains what VAE and GAN are and how to use them with Keras!
