@@ -11,6 +11,7 @@
 - [Chapter 4. Machine Learning Fondamentals](#chapter-4-machine-learning-fondamentals)
 - [Chapter 5. Deep Learning for computer vision](#chapter-5-deep-learning-for-computer-vision)
 - [Chapter 6. Deep Learning for text and sequences](#chapter-6-deep-learning-for-text-and-sequences)
+- [Chapter 7. Best practices for advanced Deep Learning](#chapter-7-best-practices-for-advanced-deep-learning)
 
 
 ## Step-By-Step Learning
@@ -311,3 +312,124 @@ It then mixes everything we learned in this chapter to create a neural network.
 
 <br>
 We have seen other layers that we can use in our Keras models!
+
+
+<br>
+
+### Chapter 7. Best practices for advanced Deep Learning 
+
+<br>
+
+**Functional Keras API**
+
+In this chapter we see the functional Keras API to create tensors that receive tensors and return tensors. Example below: 
+
+```bash
+from keras import Input, layers
+from keras.models import Model
+
+input_tensor = Input(shape(64, ))
+x = layers.Dense(32, activation='relu')(input_tensor)
+x = layers.Dense(32, activation='relu')(x)
+output_tensor = layers.Dense(10, activation='softmax')(x)
+
+model = Model(input_tensor, output_tensor)
+```
+
+**Multi-input models**
+
+With this new configuration you can configure multi-input models, like this example:
+
+![alt text](multiinput.jpg "Multi-Input Model")
+
+
+**Multi-output models**
+
+Similarly, you can create a model with multi-output
+
+![alt text](multioutput.jpg "Multi-Output Model")
+
+
+**Graphs**
+
+With these you can create graphs: advanced connections between layers.
+<br>
+The book shows some models that uses graphs architetture:
+<li>Inception Module</li>
+<li>Residual Connections</li>
+
+<br>
+
+**Keras Callback and Tensorflow TensorBoard**
+
+You can use Keras callbacks methods to customize and gain insight of what's happening in your neural network.
+
+**ModelCheckpoint and EarlyStopping**
+
+<li>EarlyStopping: stop the training when a certain condition or loss is met</li>
+<li>ModelCheckpoint: save the model when a certain condition is met</li>
+
+```bash
+import keras
+
+callbacks_list = [
+    keras.callbacks.EarlyStopping(monitor='acc', patience=1),
+    keras.callbacks.ModelCheckpoint(filepath='my_model.h5', monitor='val_loss', save_best_only=True)
+]
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
+model.fit(x, y, epochs=10, callbacks=callbacks_list, validation_data=(x_val, y_val))
+```
+
+You can create your own Callback method.
+<br>
+These are some keras.callbacks.Callback methods already present in Keras:
+
+<li>on_epoch_begin</li>
+<li>on_epoch_end</li>
+<li>on_batch_begin</li>
+<li>on_batch_end</li>
+<li>on_train_begin</li>
+<li>on_train_end</li>
+
+
+<br>
+
+**TensorBoard**
+
+TensorBoard is a powerful website that you can use, creating a TensorBoard Callback method. In this website you can monitor anything that's happening in your neural network.
+
+```bash
+import keras
+
+callbacks_list = [
+    keras.callbacks.TensorBoard(log_dir='my_log_dir', histogram_freq=1, embeddings_freq=1)
+]
+
+model.fit(x, y, epochs=20, batch_size=128, validation_split=0.2, callbacks=callbacks_list)
+```
+
+Then you can go to https://localhost:6006 to see your neural network!
+
+
+**Keras plot_model**
+
+Another powerful tool is in keras.utils, the plot_model from Keras. With this you can create a png image of every layer of your neural network!
+
+```bash
+from keras.utils import plot_model
+
+plot_model(model, show_shapes=True, to_file='model.png')
+```
+
+<br>
+
+**Get max efficiency of your models**
+
+The book shows some advanced techniques to improve your models, such as:
+<li>Batch normalizzation</li>
+<li>Depth separable convolution</li>
+<li>Hyperparameters Fine-Tuning</li>
+<li>Model assembly</li>
+
+This chapter shows some cool and advanced techniques to improve the quality of your neural networks!
