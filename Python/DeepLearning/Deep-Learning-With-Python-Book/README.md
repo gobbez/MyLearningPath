@@ -599,7 +599,7 @@ model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
 
 **Recurrent Neural Network (RNN)**
 
-This network elaborates a single timestep input at time while keeping a state (a vector or list of vectors, a point in the states-space)
+Recurrent Neural Network elaborates a single timestep input at time while keeping a state (a vector or list of vectors, a point in the states-space)
 <br>
 This network performs better than Conv1D for time-series where the recent-past is more important than long-past.
 <br>
