@@ -8,7 +8,8 @@ An introductory course on AI Agents, what those are and how to create one.
 
 ## List of Content
 
-- [1. Introduction to Deep Learning](#1-introduction-to-deep-learning)
+- [1. What are AI Agents](#1-what-are-ai-agents)
+- [2. How can AI Agents improve](#2-how-can-ai-agents-improve)
 
 
 ## 1. What are AI Agents?
@@ -23,5 +24,13 @@ This first lesson shows the AI Agent parts and an overview of the code (that you
 - Memory: Collections of interactions between user and ai or data to improve Agent abilities.
 - Tools: Functions or API calls that we use to send information to our Agent.
 
+
+## 2. How can AI Agents improve?
+
+This chapter explains what is Metacognition, sumarizing it as the process of saving and storing user preferences and adding more informations as the conversation goes on.
+<br>
+So the "memory" of the AI Agent must always be filled with new information and also, it must be re-called for each interaction to make the AI Agent always pertinent with the context of the message.
+<br>
+Some code examples are shown too, to explain an interaction by a user that wants to book a flight and the AI Agent that asks questions and saves informations.
 
 

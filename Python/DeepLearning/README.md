@@ -7,6 +7,7 @@
 Here you can find the notes and code of the books i've studied or the courses i've followed.
 
 - [Book](Deep-Learning-With-Python-Book/): F. Chollet (co-founder of Keras) book that digs deep into this field with theory, explanations and coding.
+- [Courses](MIT-courses/): MIT courses followed with notes and code examples of one of the most rated universities in the world. Everything related to Deep Learning from MIT will be here.
 
 
 ## Projects
