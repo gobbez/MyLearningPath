@@ -11,7 +11,7 @@ This course will teach from basics to advanced concepts of Deep Learning and its
 
 ## List of courses
 
-- [1. Introduction to Deep Learning](6.S191_1)
+- [1. MIT 6.S191 - Introduction to Deep Learning](MIT_6.S191_1_Introduction_to_Deep_Learning/)
 
 <br>
 
