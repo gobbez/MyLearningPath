@@ -6,10 +6,11 @@ Welcome to my **MyLearningPath** repository! This is a structured collection of 
 This repository is divided into thematic sections:
 
 - **Python/**: Covers Python programming and everything related, from Data Science to Deep Learning to Django.
+    - **Bots/**: Applications and Bots created.
+    - **CyberSecurity/**: Books and courses about CyberSecurity.
     - **DataScience/**: Includes Kaggle projects and Data Science learning materials and courses.
     - **DeepLearning/**: Focuses on Deep Learning concepts, theory, courses and models created.
     - **Django/**: Notes and projects using this Framework.
-    - **Bots/**: Applications and Bots created.
   
 - **React/**: Frontend development projects with React.
 
