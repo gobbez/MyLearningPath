@@ -1,0 +1,5 @@
+$0 = script name
+$1, $2, $3, ecc = positional arguments
+$# = number of positional arguments
+$* = every positional argument
+$@ = every positional argument, where every argument is quoted singolarly

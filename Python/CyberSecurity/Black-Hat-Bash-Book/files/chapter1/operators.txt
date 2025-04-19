@@ -1,0 +1,17 @@
+# Control Operators 
+& = executes the comand in background
+&& = executes both comands (AND)
+| = redirect the output of first comand as input of second one
+|| = executes second comand only if first isn't executed (OR)
+( ; ) = group comands in a single one (executes everyone)
+; = wait the first comand to finish and executes the second
+;; = stops a case istruction
+
+# Redirect Operators
+> = writes stdout output of first comand to a file, overwriting it
+>> = writes stdout output of first comand to a file, appending it
+&> = or >& writes stdout and stderr in a file, overwriting it, without showing on console
+&>> = writes stdout and stderr in a file, appending it, without showing on console
+< = redirect input to a comand, without showing on console
+<< = redirect more input lines to a comand, without showing on console
+| = redirect the output of first comand as input of second one
