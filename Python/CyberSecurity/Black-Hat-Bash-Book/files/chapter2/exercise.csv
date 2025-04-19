@@ -1,0 +1,7 @@
+PING google.it (142.250.180.131) 56(84) bytes of data.
+64 bytes from mil04s43-in-f3.1e100.net (142.250.180.131): icmp_seq=1 ttl=114 time=13.6 ms
+64 bytes from mil04s43-in-f3.1e100.net (142.250.180.131): icmp_seq=2 ttl=114 time=15.9 ms
+
+--- google.it ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1053ms
+rtt min/avg/max/mdev = 13.588/14.719/15.851/1.131 ms

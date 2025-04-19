@@ -1,0 +1,7 @@
+# You can personalize shell in order to make some functions/scripts available with alias
+# You can modify file ~/.bashrc to include your scripts or functions
+# You can create alias like this example: alias pingo="ping www.google.it"
+
+# You can save these alias or functions in your bashrc file and make them available with comand: sourc ~/.bashrc
+
+# You can import your scripts with this comand: source ~/."scriptname".sh

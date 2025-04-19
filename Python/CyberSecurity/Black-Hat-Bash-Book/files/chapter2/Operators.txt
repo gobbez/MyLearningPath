@@ -1,0 +1,26 @@
+# Test Operators
+(check if..)
+-d = file is a directory
+-r = file is readable
+-x = file is executable
+-w = file is writeable
+-f = file is normal
+-s = file dimensions > 0
+
+# String Operators
+(check if..)
+= string is equal to the other
+== like = if used insed [[]]
+!= string is not equal to the other
+< string is before the other in alphabetical order
+> string is after the other in alphabetical order
+-z string is null
+-n string is not null
+
+# Number Operators
+-eq = number == other
+-ne = number != other
+-ge = number >= other
+-gt = number > other
+-le = number <= other 
+-lt = number < other
