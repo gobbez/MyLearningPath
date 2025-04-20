@@ -9,6 +9,7 @@
 - [Chapter 2. Flux control and text elaboration](#chapter-2-flux-control-and-text-elaboration)
 - [Chapter 3. Creation of hacking laboratory](#chapter-3-creation-of-hacking-laboratory)
 - [Chapter 4. Recognition](#chapter-4-recognition)
+- [Chapter 5. Vulnerability Scanner and Fuzzing](#chapter-5-vulnerability-scanner-and-fuzzing)
 
 
 ## Step-By-Step Learning
@@ -74,3 +75,23 @@ This chapter lets us create some interesting script to extract information of ou
 There are plenty of exercises to do, where every script is found here:
 
 [Files/Chapter4](files/chapter4/)
+
+<br>
+
+### Chapter 5. Vulnerability Scanner and Fuzzing
+
+In this super interesting chapter we continued to explore our test-network and the book guided us to create scripts for our sessions.
+<br>
+We used different tools to discover vulnerabilities and extracting some informations, urls and even downloading files.
+<br>
+The tools that we have used are:
+<li>Nikto: A web server scanner</li>
+<li>Nmap: Network Mapper — the Swiss army knife of network scanning.</li>
+<li>Nuclie: A fast, customizable vulnerability scanner powered by YAML templates.</li>
+<li>Wfuzz: A web fuzzer.</li>
+<li>Wget: A command-line tool to download files from the web.</li>
+
+<br>
+You can find the scripts here:
+
+[Files/Chapter5](files/chapter5/)

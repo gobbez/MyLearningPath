@@ -1,0 +1,3 @@
+# Dirsearch started Sun Apr 20 12:40:50 2025 as: /usr/lib/python3/dist-packages/dirsearch/dirsearch.py -u http://172.16.10.11/backup/acme-impact-alliance/
+
+301   337B   http://172.16.10.11/backup/acme-impact-alliance/js    -> REDIRECTS TO: http://172.16.10.11/backup/acme-impact-alliance/js/

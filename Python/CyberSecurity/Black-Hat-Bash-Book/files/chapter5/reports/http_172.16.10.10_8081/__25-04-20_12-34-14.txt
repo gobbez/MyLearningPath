@@ -1,0 +1,7 @@
+# Dirsearch started Sun Apr 20 12:36:38 2025 as: /usr/lib/python3/dist-packages/dirsearch/dirsearch.py -u http://172.16.10.10:8081/
+
+400   167B   http://172.16.10.10:8081/console
+200   380B   http://172.16.10.10:8081/upload
+500    12KB  http://172.16.10.10:8081/uploads
+404    24B   http://172.16.10.10:8081/uploads/affwp-debug.log
+404    24B   http://172.16.10.10:8081/uploads/dump.sql
