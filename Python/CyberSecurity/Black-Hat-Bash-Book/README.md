@@ -8,6 +8,7 @@
 - [Chapter 1. The Bash Shell](#chapter-1-the-bash-shell)
 - [Chapter 2. Flux control and text elaboration](#chapter-2-flux-control-and-text-elaboration)
 - [Chapter 3. Creation of hacking laboratory](#chapter-3-creation-of-hacking-laboratory)
+- [Chapter 4. Recognition](#chapter-4-recognition)
 
 
 ## Step-By-Step Learning
@@ -21,6 +22,7 @@ The book teaches how to create scripts with various functions (like receive inpu
 At the end of the chapter there is a simple exercise.
 <br>
 You can find some exercises in 
+
 [Files/Chapter1](files/chapter1)
 
 <br>
@@ -34,6 +36,7 @@ Using operators and conditions to create efficient loops and save results to fil
 One exercise provided some IPs to filter, extract and modify.
 <br>
 As always, there are lots of Bash exercises to do, that you can find in:
+
 [Files/Chapter2](files/chapter2/)
 
 <br>
@@ -56,3 +59,18 @@ Here's a list of tools installed:
 <li>RustScan</li>
 <li>unix-privesc-check</li>
 <li>WhatWeb</li>
+
+<br>
+
+### Chapter 4. Recognition
+
+This chapter lets us create some interesting script to extract information of our target network, such as:
+<li>ip info</li>
+<li>ping hosts</li>
+<li>watchdog script</li>
+<li>os info</li>
+<li>server info</li>
+<br>
+There are plenty of exercises to do, where every script is found here:
+
+[Files/Chapter4](files/chapter4/)

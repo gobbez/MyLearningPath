@@ -1,0 +1,19 @@
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:44 EDT
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:49 EDT
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.00023s latency).
+
+PORT     STATE SERVICE VERSION
+3337/tcp open  http    SimpleHTTPServer 0.6 (Python 3.11.7)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 6.64 seconds
+Starting Nmap 7.92 ( https://nmap.org ) at 2025-04-19 15:51 EDT
