@@ -10,6 +10,7 @@
 - [Chapter 3. Creation of hacking laboratory](#chapter-3-creation-of-hacking-laboratory)
 - [Chapter 4. Recognition](#chapter-4-recognition)
 - [Chapter 5. Vulnerability Scanner and Fuzzing](#chapter-5-vulnerability-scanner-and-fuzzing)
+- [Chapter 6. Acquire a Web Shell](#chapter-6-acquire-a-web-shell)
 
 
 ## Step-By-Step Learning
@@ -95,3 +96,18 @@ The tools that we have used are:
 You can find the scripts here:
 
 [Files/Chapter5](files/chapter5/)
+
+<br>
+
+### Chapter 6. Acquire a Web Shell
+
+In this chapter we see different techniques and tools to try to install a web shell in our target.
+<br>
+We used the BurpSuite tool to add another app.py file to overwrite the current one in order to make us create and use a web shell.
+<br>
+Then, we managed to execute some bash code directly into our target-server.
+
+<br>
+You can find some scripts here:
+
+[Files/Chapter6](files/chapter6/)
