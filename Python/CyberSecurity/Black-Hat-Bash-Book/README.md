@@ -11,6 +11,7 @@
 - [Chapter 4. Recognition](#chapter-4-recognition)
 - [Chapter 5. Vulnerability Scanner and Fuzzing](#chapter-5-vulnerability-scanner-and-fuzzing)
 - [Chapter 6. Acquire a Web Shell](#chapter-6-acquire-a-web-shell)
+- [Chapter 7. Reverse Shell](#chapter-7-reverse-shell)
 
 
 ## Step-By-Step Learning
@@ -111,3 +112,16 @@ Then, we managed to execute some bash code directly into our target-server.
 You can find some scripts here:
 
 [Files/Chapter6](files/chapter6/)
+
+<br>
+
+### Chapter 7. Reverse Shell
+
+This chapter shows some common methods to enable reverse-shell, meaning to connect the target to our machine so that we can use it back (reverse shell).
+<br>
+In the chapter there is also an exercise to brute force a ssh (on our test server) and we managed to find the right combination of credentials.
+
+<br>
+Some scripts here:
+
+[Files/Chapter7](files/chapter7)
