@@ -12,6 +12,7 @@
 - [Chapter 5. Vulnerability Scanner and Fuzzing](#chapter-5-vulnerability-scanner-and-fuzzing)
 - [Chapter 6. Acquire a Web Shell](#chapter-6-acquire-a-web-shell)
 - [Chapter 7. Reverse Shell](#chapter-7-reverse-shell)
+- [Chapter 8. Local Information Gathering](#chapter-8-local-informations-gathering)
 
 
 ## Step-By-Step Learning
@@ -125,3 +126,11 @@ In the chapter there is also an exercise to brute force a ssh (on our test serve
 Some scripts here:
 
 [Files/Chapter7](files/chapter7)
+
+<br>
+
+### Chapter 8. Local Informations Gathering
+
+This chapter showed many arguments on local settings, commands, planned scripts and so on.
+
+[Files/Chapter8](files/chapter8)
