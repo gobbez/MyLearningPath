@@ -13,6 +13,10 @@
 - [Chapter 6. Acquire a Web Shell](#chapter-6-acquire-a-web-shell)
 - [Chapter 7. Reverse Shell](#chapter-7-reverse-shell)
 - [Chapter 8. Local Information Gathering](#chapter-8-local-informations-gathering)
+- [Chapter 9. Escalation Of Privileges](#chapter-9-escalation-of-privileges)
+- [Chapter 10. Persistency](#chapter-10-persistency)
+- [Chapter 11. Network Survery and Lateral Movements](#chapter-11-network-survey-and-lateral-movements)
+- [Chapter 12. Defenses Elusion and Exfiltration](#chapter-12-defenses-elusion-and-exfiltration)
 
 
 ## Step-By-Step Learning
@@ -133,4 +137,57 @@ Some scripts here:
 
 This chapter showed many arguments on local settings, commands, planned scripts and so on.
 
+<br>
+
 [Files/Chapter8](files/chapter8)
+
+
+<br>
+
+### Chapter 9. Escalation Of Privileges
+
+In this chapter we have learned what is privileges escalation, how to change autorizations in the settings, search files by autorizations.
+<br>
+We have created a script for brute-force a password and to exploit sudo configurations.
+<br>
+The book explained GTFOBins, its functions and how to create a search method with it.
+
+<br>
+
+[Files/Chapter9](files/chapter9)
+
+<br>
+
+### Chapter 10. Persistency
+
+This chapter explains how to keep persistency in the network in order to mantain access and control.
+<br>
+It showed different ways to mantain access and their risks and we programmed a script to create a fake sudo that can give us passwords and control.
+
+<br>
+
+[Files/Chapter10](files/chapter10)
+
+<br>
+
+### Chapter 11. Network Survey and Lateral Movements
+
+In this chapter we have seen different methods to gain access to other machines using a machine where we had access.
+<br>
+We have also seen some scripts and tools to gain access of databases.
+
+<br>
+
+[Files/Chapter11](files/chapter11)
+
+<br>
+
+### Chapter 12. Defenses Elusion and Exfiltration
+
+In this last chapter we have seen some common tools and methods to find and block suspicious activities. 
+<br>
+We have seen some methods to try to mask or render invisible our attacking methods. 
+
+<br>
+
+[Files/Chapter12](files/chapter12)
