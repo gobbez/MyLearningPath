@@ -8,8 +8,10 @@ The first chapter explains Passive and Active Information Gathering.
 
 ## Passive Gathering Methods & Tools
 
+<li>"website url"/robots.txt: file that may show informations</li>
 <li>Command: host "website url": gain ip and other info</li>
 <li>Command: whois "website url or ip": gain informations</li>
+<li>Command: whatweb "website url": get info about server, ip, etc</li>
 <li>HttTrack: download the website to analyze it's source code</li>
 <li>NetCraft: gain informations like emails, operating system, technologies..</li>
 
@@ -99,3 +101,35 @@ DNS (Domain Name System) is a protocol to resolve website names to ip addresses.
 <li>dig is another tool for active gathering</li>
 <li>fierce is another tool, that can also enable brute force to find subdomains</li>
 
+### Host Discovery with Nmap
+
+Nmap is a tool for port-scanning and active information gathering. 
+<br>
+You can use it to search for subdomains of a website.
+<br>
+(Alternatively you can use Netdiscover, that does the same but using an ARP method instead)
+<br>
+<li>sudo nmap -sn "ip address": this command will show every ip address linked to a particolar ip</li>
+
+### Port Scanning with Nmap
+
+After you have discovered some ips of an host you can perform a port scanning, with Nmap tool.
+<br>
+To summarize, you can do:
+<li>nmap "ip address": to scan the open ports of that ip (NB: if it's a Windows ip, sometimes you can use the nmap -Pn command instead)</li>
+<li>nmap -p "port(s)" "ip address": optional to scan only certain port(s)</li>
+<li>nmap -sV "ip address": scan the ports and their service version running</li>
+<li>nmap -O "ip address": scan the operating system too</li>
+<li>nmap -sC "ip address": scan more informations of the ports</li>
+<li>nmap -T"number from 0 to 4" "ip address": scan faster or slower</li>
+You can finish the command with -oN or -oX to save the results in a file (example a text) or a xml file.
+
+### Gobuster
+
+You can find a list of available urls with Gobuster.
+<li>gobuster dir -u "website url" -w /usr/share/wordlists/dirb/common.txt</li>
+
+
+### LAB 1
+
+In the first lab we had to explore a website and gather informations. There were 5 "flags" to capture.

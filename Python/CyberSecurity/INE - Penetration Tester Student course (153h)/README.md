@@ -6,4 +6,4 @@ The Penetration Tester Student course is a 150h+ path that starts from basics of
 
 ## Lessons
 
-- [Chapter 1 - Chapter 1 - Assessment Methodologies Information Gathering](Ch01_Assessment_Methodologies_Information_Gathering)
+- [Chapter 1 - Chapter 1 - Assessment Methodologies](Ch01_Assessment_Methodologies)
