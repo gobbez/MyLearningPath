@@ -1626,3 +1626,157 @@ set FILENAME "example.txt"  # Create the name of your text file to upload
 run  # Try to upload the file to the server
 curl http://target-ip/data/example.txt  # Show the file you have uploaded
 ```
+
+
+## Assessment Methodologies: Auditing Fundamentals
+
+### Overview of Security Auditing
+
+Security Auditing is the process of evaluating and verify the security measures of an organization.
+<br>
+
+**Why is Security Auditing important?**
+
+<li>Identify vulnerabilities and weaknesses</li>
+<li>Ensuring compliance</li>
+<li>Enhancing risk managment</li>
+<li>Improving security policies and procedures</li>
+<li>Supporting business objective</li>
+<li>Continuous improvements</li>
+
+#### Essential Terminology
+
+![alt text](auditing_terminology.jpg "Auditing Terminology")
+![alt text](aud_essential_terminology.jpg "Essential Auditing Terminology")
+
+#### Security Auditing Process/Lifecycle
+
+The Security Auditing process has different phases:
+<li>Planning and Preparation</li>
+<li>Information Gathering</li>
+<li>Risk Assessment</li>
+<li>Audit Execution</li>
+<li>Analysis and Evaluation</li>
+<li>Reporting</li>
+<li>Remediation</li>
+
+![alt text](auditing_lifecycle.jpg "Auditing Lifecycle")
+
+
+#### Types of Security Audits
+
+Security Audits can be categorized based on the scope, methodology and the aspects of the organization.
+
+![alt text](auditing_types.jpg "Auditing Types")
+![alt text](auditing_sec_types.jpg "Security Auditing Types")
+
+
+#### Security Auditing and Penetration Testing
+
+![alt text](auditing_vs_pentesting.jpg "Security Auditing VS Penetration Testing")
+
+#### Governance, Risk and Compliance (GRC)
+
+GRC is a framework used by organizations to manage and align their governance practices, risk strategies and compliance with regulatory systems.
+<br>
+<li>Governance means that the organization can complete its objective with compliance with legal requirements.</li>
+<li>Risk identify, analyze and mitigate risks that could negatively impact the organization (like vulnerabilities).</li>
+<li>Compliance ensures that the organization adhere to relevant laws and industry standards (such as GDPR, HIPAA, PCI DSS).</li>
+<br>
+For Penetration Testers, knowing GRC can help doing more precise assessments, enhance their reporting and create strategical reccomendations.
+
+#### Common Standards, Frameworks and Guidelines 
+
+Frameworks provide a structured approach to implement security practices, Standards set specific requirements and criteria to achieve that compliance and Guidelines are the best practices to improve security.
+
+#### Frameworks 
+
+**Nist Cybersecurity Framework (CSF)** is a set of guidelines and best practices deployed by NIST.
+<br>
+
+**Cobit** a framework for implementing, monitoring and improing IT governance.
+<br>
+
+**ISO/IEC 27001** an international standard for information security managment systems (ISMS).
+<br>
+
+**PCI Data Security Standards (PCI DSS)** a set of security standards to protect payment card information.
+<br>
+
+**Hipaa** U.S. health data law that sets the standards to protect sensitive patient information.
+<br>
+
+**GDPR** European regulation that governs data protection and privacy for individuals in the EU.
+<br>
+
+#### Guidelines 
+
+**CIS Controls** a set of best practices to improve an organization cybersecurity posture. 
+<br>
+
+**Nist Sp 800-53** a catalog (published by Nist) for security and privacy controls for federal informations.
+<br>
+
+
+### Phase 1 - Developing a Security Policy
+
+In this section we'll see a step-by-step action of creating a Security Policy, creating Auditing and finally doing the Pen.Testing.
+<br>
+In the first Phase, in order to create a Security Policy, we will do:
+
+#### Requirements Gathering
+
+We will define the purpose, the authentication method(s), the configuration needed and the general principles the company must adhere (like the Nist Sp 800-53).
+<br>
+We will create a table specifying the Policy Area - Control ID - Policy Statements that must follow the guidelines we decided to use (like the Nist Sp 800-53) for the categories such as: 
+<li>Access Control (AC)</li>
+<li>Audit and Accountability (AU)</li>
+<li>Configuration Management</li>
+<li>Identification and Authentication</li>
+<li>System and Information Integrity (SI)</li>
+<li>Maintenance (MA)</li>
+
+
+### Phase 2 - Security Auditing with Lynis
+
+Lynis is a Linux tool that can do an health scan of your system for compliance testing.
+<br>
+First thing is to download the latest Lynis version, then you can install it and perform different types of system auditing.
+
+```bash
+# Download and install Lynis
+chmod +x ./lynis  # Make it executable
+./lynis audit system  # Start an audit for your local system (you can specify different types of audit)
+```
+
+Now Lynis will perform a check on your whole local system and you'll see its suggestions and the vulnerabilities or weaknesses it found.
+<br>
+You can see which of these are relevant for the Policy you want to use and try to improve following its results.
+<br>
+You can specify what kind of controls it must follow:
+
+```bash
+./lynis audit system --tests HRDN-7230  # Make an audit check trying to follow the HRDN-7230 for our malware detection systems
+```
+
+You can save the results renaming them:
+
+```bash
+./lynis audit system --auditor "name"  # Save the results with a name
+```
+
+### Phase 3 - Conduct Penetration Test
+
+We have to test the effectiveness of the audit remediation by performing a penetration testing, so we can very if the system is now secure (or more secure).
+<br>
+With penetration testing we can very if the vulnerabilities or weaknesses are resolved.
+<br>
+We will create a final report with our findings.
+<br>
+Here are some examples of what we can do:
+
+```bash
+hydra -l root -P /usr/share/seclists/Passwords/xato-net-10-million-passwords.txt ssh:target-ip:target-port -t 2 -v  # Use Hydra to check, with brute-force, if the password is still vulnerable in the SSH service
+```
+
+In this example, Hydra managed to find that the password on the SSH is still vulnerable, so we can report it and proceed increasing its complexity or trying to change some ssh configurations on our system.
